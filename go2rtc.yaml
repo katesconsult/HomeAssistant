@@ -1,0 +1,8 @@
+streams:
+  front_door:
+    - rtsp://03cabcc9-ring-mqtt:8554/047bcb1e05fa_live
+    - "ffmpeg:ring_front#video=h264#bitrate=2500k#fps=15#audio=copy"
+
+  trains:
+    - rtsp://03cabcc9-ring-mqtt:8554/9c7613f4c961_live
+    - "ffmpeg:ring_front#video=h264#bitrate=2500k#fps=15#audio=copy"

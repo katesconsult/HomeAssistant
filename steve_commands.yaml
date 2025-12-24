@@ -1,0 +1,46 @@
+# SteVe OCPP server APIs
+start_wb01:
+  url: "http://192.168.4.152:8081/steve/api/ocpp/WB01/remoteStart"
+  method: POST
+  headers:
+    Content-Type: application/json
+    4cb3d8ca7a57621e62f8c28e0f689bd91410ee965edbaca8a2dd941cd8fd6b74: home-assistant-rest-call
+  payload: >
+    {
+      "idTag": "HAOS",
+      "connectorId": 0
+    }
+
+stop_wb01:
+  url: "http://192.168.4.152:8081/steve/api/ocpp/WB01/remoteStop"
+  method: POST
+  headers:
+    Content-Type: "application/json"
+    4cb3d8ca7a57621e62f8c28e0f689bd91410ee965edbaca8a2dd941cd8fd6b74: home-assistant-rest-call
+  payload: >
+    {
+      "transactionId": {{ states('sensor.wb01_transaction_id') | int }}
+    }
+
+start_wb02:
+  url: "http://192.168.4.152:8081/steve/api/ocpp/WB02/remoteStart"
+  method: POST
+  headers:
+    Content-Type: application/json
+    4cb3d8ca7a57621e62f8c28e0f689bd91410ee965edbaca8a2dd941cd8fd6b74: home-assistant-rest-call
+  payload: >
+    {
+      "idTag": "HAOS",
+      "connectorId": 0
+    }
+
+stop_wb02:
+  url: "http://192.168.4.152:8081/steve/api/ocpp/WB02/remoteStop"
+  method: POST
+  headers:
+    Content-Type: "application/json"
+    4cb3d8ca7a57621e62f8c28e0f689bd91410ee965edbaca8a2dd941cd8fd6b74: home-assistant-rest-call
+  payload: >
+    {
+      "transactionId": {{ states('sensor.wb02_transaction_id') | int }}
+    }

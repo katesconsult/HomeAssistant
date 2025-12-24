@@ -51,3 +51,48 @@ select_channel_family_room:
     action: androidtv.adb_command
     enabled: false
   mode: single
+family_room_shades_open:
+  sequence:
+  - action: scene.turn_on
+    metadata: {}
+    target:
+      entity_id: scene.powerview_hub_family_room_open
+    data: {}
+  - action: input_number.set_value
+    metadata: {}
+    target:
+      entity_id: input_number.family_room_shade_position
+    data:
+      value: 100
+  alias: Family room shades open
+  description: ''
+family_room_shades_close:
+  sequence:
+  - action: scene.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: scene.powerview_hub_family_room_close
+  - action: input_number.set_value
+    metadata: {}
+    target:
+      entity_id: input_number.family_room_shade_position
+    data:
+      value: 0
+  alias: Family room shades close
+  description: ''
+family_room_shades_sun_block:
+  sequence:
+  - action: scene.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: scene.powerview_hub_tv_watching
+  - action: input_number.set_value
+    metadata: {}
+    target:
+      entity_id: input_number.family_room_shade_position
+    data:
+      value: 50
+  alias: Family room shades sun block
+  description: ''

@@ -1,0 +1,16 @@
+# camera:
+
+- platform: ffmpeg
+  name: Trains Live
+  input: rtsp://03cabcc9-ring-mqtt:8554/9c7613f4c961_live
+  extra_arguments: "-rtsp_transport tcp -r 15 -vf scale=960:540"
+
+#- platform: ffmpeg
+#  name: Front Door Live
+#  input: rtsp://03cabcc9-ring-mqtt:8554/047bcb1e05fa_live
+#  extra_arguments: "-rtsp_transport tcp -r 15 -vf scale=960:540"
+
+
+#- platform: generic
+#  name: Trains Live
+#  stream_source: rtsp://127.0.0.1:8554/trains

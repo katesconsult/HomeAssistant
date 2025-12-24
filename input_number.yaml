@@ -1,4 +1,6 @@
 #input_number:
+
+# Virtual (mock) shade positions
 family_room_shade_position:
   name: Family Room Shade Position
   min: 0
@@ -9,3 +11,17 @@ kitchen_shade_position:
   min: 0
   max: 100
   step: 1
+  
+# Transaction IDs for wallbox chargers
+wb01_transaction_id:
+  name: SteVe WB01 Transaction ID
+  min: 0
+  max: 999999999
+  step: 1
+  mode: box
+wb02_transaction_id:
+  name: SteVe WB02 Transaction ID
+  min: 0
+  max: 999999999
+  step: 1
+  mode: box

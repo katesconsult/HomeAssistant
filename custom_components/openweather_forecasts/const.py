@@ -1,5 +1,6 @@
 DOMAIN = "openweather_forecasts"
 
+LOCATION = "location"
 CONF_API_KEY = "api_key"
 CONF_LAT = "latitude"
 CONF_LON = "longitude"

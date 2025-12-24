@@ -59,7 +59,7 @@ class OpenWeatherCoordinator(DataUpdateCoordinator):
                     "humidity": humidity,
                     "overnight_low": overnight_low,
                     "overnight_high": overnight_high,
-                    "last_update": datetime.utcnow().isoformat(),
+                    "last_updated": datetime.utcnow().isoformat(),
                 }
 
         except Exception as err:

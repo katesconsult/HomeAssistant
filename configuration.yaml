@@ -26,15 +26,18 @@ automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
 
-# Define input numbers
-input_number: !include input_number.yaml
+# Define cameras
+#mqtt: !include mqtt.yaml
+camera: !include cameras.yaml
 
-# Define sensors for displaying time, weather and vehicle information
+# Define shades (covers), display formats for vehicles, weather, etc.
 template: !include templates.yaml
+input_number: !include input_number.yaml
+input_boolean: !include input_boolean.yaml
 
-# Configure wallbox controls and sensors
-rest_command: !include wallbox_apis.yaml
-sql: !include wallbox_sql.yaml
+# Configure steve and wallbox APIs and queries
+rest_command: !include steve_commands.yaml
+sql: !include steve_queries.yaml
 
 # Initialize logger to debug custom components
 logger:

@@ -1,0 +1,154 @@
+# Add sensors to query SteVe database for wallbox status information
+
+# Tesla wallbox charger (WB01) charging status
+- name: Wallbox Tesla Status
+  unique_id: wallbox_tesla_status
+  db_url: !secret stevedb_url
+  query: |
+    SELECT
+      COALESCE(
+        (
+          SELECT cs.status
+          FROM connector_status cs
+          JOIN connector c
+            ON cs.connector_pk = c.connector_pk
+          WHERE c.charge_box_id = 'WB01'
+            AND c.connector_id = 1
+          ORDER BY cs.status_timestamp DESC
+          LIMIT 1
+        ),
+        'unknown'
+      ) AS status;
+  column: status
+
+# Tesla wallbox charger (WB01) charging errors
+- name: Wallbox Tesla Error
+  unique_id: wallbox_tesla_error
+  db_url: !secret stevedb_url
+  query: |
+    SELECT
+      COALESCE(
+        (
+          SELECT
+            CASE error_code
+              WHEN 'NoError' THEN 'OK'
+              WHEN 'ConnectorLockFailure' THEN 'Connector Lock Failure'
+              WHEN 'EVCommunicationError' THEN 'EV Communication Error'
+              WHEN 'GroundFailure' THEN 'Ground Failure'
+              WHEN 'HighTemperature' THEN 'High Temperature'
+              WHEN 'InternalError' THEN 'Internal Error'
+              WHEN 'LocalListConflict' THEN 'Local Authorization List Conflict'
+              WHEN 'OtherError' THEN 'Other / Unknown Error'
+              WHEN 'OverCurrentFailure' THEN 'Overcurrent Failure'
+              WHEN 'PowerMeterFailure' THEN 'Power Meter Failure'
+              WHEN 'PowerSwitchFailure' THEN 'Power Switch Failure'
+              WHEN 'ReaderFailure' THEN 'RFID Reader Failure'
+              WHEN 'ResetFailure' THEN 'Reset Failure'
+              WHEN 'UnderVoltage' THEN 'Undervoltage'
+              WHEN 'OverVoltage' THEN 'Overvoltage'
+              WHEN 'WeakSignal' THEN 'Weak Wireless Signal'
+              ELSE error_code
+            END AS error_code      
+          FROM connector_status
+          INNER JOIN connector
+            ON connector_status.connector_pk = connector.connector_pk
+          WHERE connector.charge_box_id='WB01' AND connector.connector_id=1
+          ORDER BY status_timestamp
+          LIMIT 1
+        ),
+        'unknown'
+      ) AS error_code;
+  column: error_code
+
+- name: "Wallbox Tesla Transaction ID"
+  unique_id: wb01_transaction_id
+  db_url: !secret stevedb_url
+  query: >
+    SELECT COALESCE(
+      (SELECT t.transaction_pk
+       FROM transaction t
+       JOIN connector c ON t.connector_pk = c.connector_pk
+       WHERE c.charge_box_id = 'WB01'
+         AND c.connector_id = 1
+       ORDER BY t.start_event_timestamp DESC
+       LIMIT 1),
+      0
+    ) AS transaction_id;
+  column: transaction_id
+
+#
+# Lexus Wallbox (WB02) entities for status and errors
+#
+- name: Wallbox Lexus Status
+  unique_id: wallbox_lexus_status
+  db_url: !secret stevedb_url
+  query:
+    SELECT
+      COALESCE(
+        (
+          SELECT cs.status
+          FROM connector_status cs
+          JOIN connector c
+            ON cs.connector_pk = c.connector_pk
+          WHERE c.charge_box_id = 'WB02'
+            AND c.connector_id = 1
+          ORDER BY cs.status_timestamp DESC
+          LIMIT 1
+        ),
+        'unknown'
+      ) AS status;
+  column: status
+
+- name: Wallbox Lexus Error
+  unique_id: wallbox_lexus_error
+  db_url: !secret stevedb_url
+  query: |
+    SELECT
+      COALESCE(
+        (
+          SELECT
+            CASE error_code
+              WHEN 'NoError' THEN 'OK'
+              WHEN 'ConnectorLockFailure' THEN 'Connector Lock Failure'
+              WHEN 'EVCommunicationError' THEN 'EV Communication Error'
+              WHEN 'GroundFailure' THEN 'Ground Failure'
+              WHEN 'HighTemperature' THEN 'High Temperature'
+              WHEN 'InternalError' THEN 'Internal Error'
+              WHEN 'LocalListConflict' THEN 'Local Authorization List Conflict'
+              WHEN 'OtherError' THEN 'Other / Unknown Error'
+              WHEN 'OverCurrentFailure' THEN 'Overcurrent Failure'
+              WHEN 'PowerMeterFailure' THEN 'Power Meter Failure'
+              WHEN 'PowerSwitchFailure' THEN 'Power Switch Failure'
+              WHEN 'ReaderFailure' THEN 'RFID Reader Failure'
+              WHEN 'ResetFailure' THEN 'Reset Failure'
+              WHEN 'UnderVoltage' THEN 'Undervoltage'
+              WHEN 'OverVoltage' THEN 'Overvoltage'
+              WHEN 'WeakSignal' THEN 'Weak Wireless Signal'
+              ELSE error_code
+            END AS error_code      
+          FROM connector_status
+          INNER JOIN connector
+            ON connector_status.connector_pk = connector.connector_pk
+          WHERE connector.charge_box_id='WB02' AND connector.connector_id=1
+          ORDER BY status_timestamp
+          LIMIT 1
+        ),
+        'unknown'
+      ) AS error_code;
+  column: error_code
+  
+- name: "Wallbox Lexus Transaction ID"
+  unique_id: wb02_transaction_id
+  db_url: !secret stevedb_url
+  query: >
+    SELECT COALESCE(
+      (SELECT t.transaction_pk
+       FROM transaction t
+       JOIN connector c ON t.connector_pk = c.connector_pk
+       WHERE c.charge_box_id = 'WB02'
+         AND c.connector_id = 1
+       ORDER BY t.start_event_timestamp DESC
+       LIMIT 1),
+      0
+    ) AS transaction_id;
+  column: transaction_id

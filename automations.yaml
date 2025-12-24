@@ -7,13 +7,14 @@
     - cover.mock_shade_family_room
     to:
     - closed
+  - trigger: sun
+    event: sunset
+    offset: 0:15:00
   conditions: []
   actions:
-  - action: scene.turn_on
+  - action: script.family_room_shades_close
     metadata: {}
     data: {}
-    target:
-      entity_id: scene.powerview_hub_family_room_close
   mode: single
 - id: '1763422572511'
   alias: Family room shades open
@@ -24,13 +25,14 @@
     - cover.mock_shade_family_room
     to:
     - open
+  - trigger: sun
+    event: sunrise
+    offset: -00:25:00
   conditions: []
   actions:
-  - action: scene.turn_on
+  - action: script.family_room_shades_open
     metadata: {}
     data: {}
-    target:
-      entity_id: scene.powerview_hub_family_room_open
   mode: single
 - id: '1763424478812'
   alias: Kitchen shades close
@@ -41,6 +43,9 @@
     - cover.mock_shade_kitchen
     to:
     - closed
+  - trigger: sun
+    event: sunset
+    offset: 0:15:00
   conditions: []
   actions:
   - action: scene.turn_on
@@ -48,6 +53,12 @@
     data: {}
     target:
       entity_id: scene.powerview_hub_kitchen_close
+  - action: input_number.set_value
+    metadata: {}
+    target:
+      entity_id: input_number.kitchen_shade_position
+    data:
+      value: 0
   mode: single
 - id: '1763424536260'
   alias: Kitchen shades open
@@ -58,6 +69,9 @@
     - cover.mock_shade_kitchen
     to:
     - open
+  - trigger: sun
+    event: sunrise
+    offset: -00:25:00
   conditions: []
   actions:
   - action: scene.turn_on
@@ -65,6 +79,12 @@
     data: {}
     target:
       entity_id: scene.powerview_hub_kitchen_open
+  - action: input_number.set_value
+    metadata: {}
+    target:
+      entity_id: input_number.kitchen_shade_position
+    data:
+      value: 100
   mode: single
 - id: '1763903166691'
   alias: Family room channel change
@@ -78,3 +98,221 @@
   - action: script.select_channel_family_room
     metadata: {}
     data: {}
+- id: '1765397415014'
+  alias: Bird feeder up after sunset
+  description: ''
+  triggers:
+  - trigger: sun
+    event: sunset
+    offset: 0:30:00
+  conditions:
+  - condition: numeric_state
+    entity_id: sensor.niwot_overnight_low
+    above: 32
+  - type: is_not_open
+    condition: device
+    device_id: 4447d55956d7f6b0ecda504335bf87c4
+    entity_id: 27308cdbe1c853dd7cd821bb720fbc92
+    domain: binary_sensor
+  actions:
+  - action: switch.turn_off
+    metadata: {}
+    target:
+      entity_id: switch.bird_feeder_reverse
+    data: {}
+  - action: switch.turn_on
+    metadata: {}
+    target:
+      entity_id: switch.bird_feeder_power
+    data: {}
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 20
+      milliseconds: 0
+  - action: switch.turn_off
+    metadata: {}
+    target:
+      entity_id: switch.bird_feeder_power
+    data: {}
+  mode: single
+- id: '1765403951885'
+  alias: Bird feeder down before sunrise
+  description: ''
+  triggers:
+  - trigger: sun
+    event: sunrise
+    offset: -0:30:00
+  conditions:
+  - type: is_open
+    condition: device
+    device_id: 4447d55956d7f6b0ecda504335bf87c4
+    entity_id: 27308cdbe1c853dd7cd821bb720fbc92
+    domain: binary_sensor
+  actions:
+  - action: switch.turn_on
+    metadata: {}
+    target:
+      entity_id: switch.bird_feeder_reverse
+    data: {}
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 2
+      milliseconds: 0
+  - action: switch.turn_on
+    metadata: {}
+    target:
+      entity_id: switch.bird_feeder_power
+    data: {}
+  - wait_for_trigger:
+    - type: not_opened
+      device_id: 4447d55956d7f6b0ecda504335bf87c4
+      entity_id: 27308cdbe1c853dd7cd821bb720fbc92
+      domain: binary_sensor
+      trigger: device
+    timeout: 00:00:20
+    continue_on_timeout: true
+  - action: switch.turn_off
+    metadata: {}
+    target:
+      entity_id: switch.bird_feeder_power
+    data: {}
+  - action: switch.turn_off
+    metadata: {}
+    target:
+      entity_id: switch.bird_feeder_reverse
+    data: {}
+  mode: single
+- id: '1765671498604'
+  alias: Family room shades partially close
+  description: ''
+  triggers:
+  - trigger: time
+    at: '10:00:00'
+  conditions:
+  - condition: numeric_state
+    entity_id: sensor.openweathermap_cloud_coverage
+    below: 50
+  actions:
+  - action: scene.turn_on
+    metadata: {}
+    target:
+      entity_id: scene.powerview_hub_tv_watching
+    data: {}
+  - action: cover.set_cover_position
+    metadata: {}
+    data:
+      position: 50
+    target:
+      entity_id: cover.mock_shade_family_room
+  - action: input_number.set_value
+    metadata: {}
+    target:
+      entity_id: input_number.family_room_shade_position
+    data:
+      value: 50
+  mode: single
+- id: '1765825990365'
+  alias: Family room shades sun lowers
+  description: ''
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.sun_elevation
+    below: 20
+  conditions:
+  - condition: template
+    value_template: "{{ this.attributes.last_triggered is none\n   or this.attributes.last_triggered.date()
+      < now().date() }}\n"
+    alias: If this automation hasn't previously run today
+  - condition: numeric_state
+    entity_id: input_number.family_room_shade_position
+    above: 0
+  actions:
+  - action: script.family_room_shades_open
+    data: {}
+  mode: single
+- id: '1765851454952'
+  alias: Wallbox Lexus sync transaction ID
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.wallbox_lexus_transaction_id
+  conditions:
+  - condition: state
+    state:
+    - unavailable
+    - unknown
+    entity_id: sensor.wallbox_lexus_transaction_id
+  actions:
+  - action: input_number.set_value
+    metadata: {}
+    target:
+      entity_id: input_number.wb02_transaction_id
+    data: {}
+  mode: single
+- id: '1766080721227'
+  alias: Family room shades sun block
+  description: ''
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.sun_elevation
+    above: 20
+  - trigger: numeric_state
+    entity_id:
+    - sensor.openweathermap_cloud_coverage
+    below: 20
+  conditions:
+  - condition: numeric_state
+    entity_id: sensor.sun_elevation
+    above: 20
+  - condition: numeric_state
+    entity_id: sensor.openweathermap_cloud_coverage
+    below: 20
+  - condition: template
+    value_template: "{{ this.attributes.last_triggered is none\n   or this.attributes.last_triggered.date()
+      < now().date() }}\n"
+    alias: If this automation hasn't previously run today
+  actions:
+  - action: script.family_room_shades_sun_block
+    data: {}
+  mode: single
+- id: '1766150245927'
+  alias: Grid status changed
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.powerwall_grid_status
+    to:
+  conditions: []
+  actions:
+  - action: notify.mobile_app_pixel_9
+    metadata: {}
+    data:
+      message: '{{ trigger.to_state.name }} changed from {{ trigger.from_state.state
+        }} to {{ trigger.to_state.state }}'
+  mode: single
+- id: '1766152038357'
+  alias: Grid power usage high during outage
+  description: ''
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.powerwall_home_usage
+    above: 0.5
+  conditions:
+  - condition: state
+    entity_id: sensor.powerwall_grid_status
+    state:
+    - off_grid_intentional
+    - off_grid
+  actions:
+  - action: notify.mobile_app_pixel_9
+    metadata: {}
+    data:
+      message: Power usage above 0.5
+  mode: single

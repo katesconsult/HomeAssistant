@@ -1,6 +1,6 @@
 from homeassistant import config_entries
 import voluptuous as vol
-from .const import DOMAIN, CONF_API_KEY, CONF_LAT, CONF_LON
+from .const import DOMAIN, CONF_API_KEY, CONF_LAT, CONF_LON, LOCATION
 
 class OpenWeatherConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Config flow for OpenWeather Forecasts."""
@@ -13,6 +13,7 @@ class OpenWeatherConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             )
 
         schema = vol.Schema({
+            vol.Required(LOCATION): str,
             vol.Required(CONF_API_KEY): str,
             vol.Required(CONF_LAT): float,
             vol.Required(CONF_LON): float,

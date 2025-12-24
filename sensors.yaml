@@ -28,12 +28,14 @@
     {% else %}
       unknown
     {% endif %}
+    
+# Create sensors for sun elevation and azimuth
+- name: Sun Elevation
+  unique_id: sun_elevation
+  unit_of_measurement: "°"
+  state: "{{ state_attr('sun.sun', 'elevation') }}"
 
-# Weather forecast overnight low
-- name: "OpenWeather Overnight Low"
-  unique_id: weather_forecast_overnight_low
-  #state: states('weather_forecast_minimum_low')
-  #state: "{{ states('weather_forecast_minimum_low') }}"
-  state: >
-    {{ states('weather_forecast_minimum_low') | float(0) }}
-  unit_of_measurement: "°F"
+- name: Sun Azimuth
+  unique_id: sun_azimuth
+  unit_of_measurement: "°"
+  state: "{{ state_attr('sun.sun', 'azimuth') }}"
