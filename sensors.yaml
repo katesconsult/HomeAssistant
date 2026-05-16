@@ -29,6 +29,22 @@
       unknown
     {% endif %}
     
+# Wallbox connector status mapping
+- name: "Wallbox Friendly Status"
+  state: >
+    {% set status = states('sensor.wallbox_tesla_status_connector') %}
+    {% set mapping = {
+      'Charging': 'Charging',
+      'SuspendedEV': 'Suspended',
+      'SuspendedEVSE': 'Suspended',
+      'WaitingForCar': 'Waiting for Car',
+      'Preparing': 'Preparing...',
+      'Finishing': 'Finishing...',
+      'Available': 'Ready',
+      'Locked': 'Locked'
+    } %}
+    {{ mapping.get(status, status) }}
+
 # Create sensors for sun elevation and azimuth
 - name: Sun Elevation
   unique_id: sun_elevation
@@ -39,3 +55,27 @@
   unique_id: sun_azimuth
   unit_of_measurement: "°"
   state: "{{ state_attr('sun.sun', 'azimuth') }}"
+  
+- name: "Sun Incidence Angle Family Room Windows"
+  unit_of_measurement: "°"
+  state: >
+    {% set sun_az = state_attr('sun.sun', 'azimuth') | float %}
+    {% set sun_el = state_attr('sun.sun', 'elevation') | float %}
+    {% set wall_az = 180.0 %}
+
+    {% set sun_el_rad = sun_el * pi / 180 %}
+    {% set az_diff_rad = (sun_az - wall_az) * pi / 180 %}
+
+    {% set cos_theta =
+      cos(sun_el_rad) *
+      cos(az_diff_rad)
+    %}
+
+    {% if cos_theta > 0 %}
+      {{ (acos(cos_theta) * 180 / pi) | round(1) }}
+    {% else %}
+      180
+    {% endif %}
+    
+
+

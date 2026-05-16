@@ -51,13 +51,15 @@ select_channel_family_room:
     action: androidtv.adb_command
     enabled: false
   mode: single
+  alias: Family room TV channel select
+  description: ''
 family_room_shades_open:
   sequence:
   - action: scene.turn_on
     metadata: {}
+    data: {}
     target:
       entity_id: scene.powerview_hub_family_room_open
-    data: {}
   - action: input_number.set_value
     metadata: {}
     target:
@@ -72,7 +74,8 @@ family_room_shades_close:
     metadata: {}
     data: {}
     target:
-      entity_id: scene.powerview_hub_family_room_close
+      entity_id:
+      - scene.powerview_hub_family_room_close
   - action: input_number.set_value
     metadata: {}
     target:
@@ -87,7 +90,8 @@ family_room_shades_sun_block:
     metadata: {}
     data: {}
     target:
-      entity_id: scene.powerview_hub_tv_watching
+      entity_id:
+      - scene.powerview_hub_family_room_watch_tv
   - action: input_number.set_value
     metadata: {}
     target:
@@ -95,4 +99,78 @@ family_room_shades_sun_block:
     data:
       value: 50
   alias: Family room shades sun block
+  description: ''
+bird_feeder_down:
+  sequence:
+  - type: turn_on
+    device_id: 0a21fe75432cc6f9d3550496176b1cce
+    entity_id: 3cb474d7bf68411b1c317e95cbb89589
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 1
+      milliseconds: 0
+  - type: turn_on
+    device_id: dced6c196cbc8af09b2bb1841066bd70
+    entity_id: 1e75fa2b8c8f695ddb125f144c1a833a
+    domain: switch
+  - wait_for_trigger:
+    - type: not_opened
+      device_id: 4447d55956d7f6b0ecda504335bf87c4
+      entity_id: 27308cdbe1c853dd7cd821bb720fbc92
+      domain: binary_sensor
+      trigger: device
+    timeout:
+      hours: 0
+      minutes: 0
+      seconds: 19
+      milliseconds: 0
+  - type: turn_off
+    device_id: dced6c196cbc8af09b2bb1841066bd70
+    entity_id: 1e75fa2b8c8f695ddb125f144c1a833a
+    domain: switch
+  - type: turn_off
+    device_id: 0a21fe75432cc6f9d3550496176b1cce
+    entity_id: 3cb474d7bf68411b1c317e95cbb89589
+    domain: switch
+  alias: Bird feeder down
+  description: ''
+bird_feeder_up:
+  sequence:
+  - type: turn_off
+    device_id: 0a21fe75432cc6f9d3550496176b1cce
+    entity_id: 3cb474d7bf68411b1c317e95cbb89589
+    domain: switch
+  - type: turn_on
+    device_id: dced6c196cbc8af09b2bb1841066bd70
+    entity_id: 1e75fa2b8c8f695ddb125f144c1a833a
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 19
+      milliseconds: 0
+  - type: turn_off
+    device_id: dced6c196cbc8af09b2bb1841066bd70
+    entity_id: 1e75fa2b8c8f695ddb125f144c1a833a
+    domain: switch
+  alias: Bird feeder up
+  description: ''
+master_bath_shades_set_target:
+  sequence:
+  - action: cover.set_cover_position
+    metadata: {}
+    target:
+      entity_id: cover.master_bath_backyard
+    data:
+      '[object Object]':
+  - action: input_number.set_value
+    metadata: {}
+    target:
+      entity_id: input_number.family_room_shade_position
+    data:
+      value:
+        '[object Object]':
+  alias: Master bath backyard shade set target
   description: ''

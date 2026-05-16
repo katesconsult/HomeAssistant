@@ -1,3 +1,6 @@
 # input_boolean:
 developer_mode:
   name: Developer Mode
+  
+powerwall_manual_override:
+  name: Powerwall Manual Override

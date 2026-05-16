@@ -37,7 +37,7 @@ input_boolean: !include input_boolean.yaml
 
 # Configure steve and wallbox APIs and queries
 rest_command: !include steve_commands.yaml
-sql: !include steve_queries.yaml
+#sql: !include steve_queries.yaml
 
 # Initialize logger to debug custom components
 logger:

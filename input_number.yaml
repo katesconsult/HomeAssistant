@@ -11,17 +11,19 @@ kitchen_shade_position:
   min: 0
   max: 100
   step: 1
+master_bath_backyard_shade_position:
+  name: Master Bath Backyard Shade Position
+  min: 0
+  max: 100
+  step: 1
+master_bath_backyard_shade_target:
+  name: Master Bath Backyard Shade Target
+  min: 0
+  max: 100
+  step: 1
+master_bath_backyard_shade_tilt:
+  name: Master Bath Backyard Tilt Position
+  min: 0
+  max: 100
+  step: 25
   
-# Transaction IDs for wallbox chargers
-wb01_transaction_id:
-  name: SteVe WB01 Transaction ID
-  min: 0
-  max: 999999999
-  step: 1
-  mode: box
-wb02_transaction_id:
-  name: SteVe WB02 Transaction ID
-  min: 0
-  max: 999999999
-  step: 1
-  mode: box

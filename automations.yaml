@@ -52,7 +52,8 @@
     metadata: {}
     data: {}
     target:
-      entity_id: scene.powerview_hub_kitchen_close
+      entity_id:
+      - scene.powerview_hub_kitchen_close_2
   - action: input_number.set_value
     metadata: {}
     target:
@@ -61,7 +62,7 @@
       value: 0
   mode: single
 - id: '1763424536260'
-  alias: Kitchen shades open
+  alias: 'PowerView: Shades Open Before Sunrise'
   description: ''
   triggers:
   - trigger: state
@@ -74,17 +75,24 @@
     offset: -00:25:00
   conditions: []
   actions:
+  - action: script.family_room_shades_open
+    metadata: {}
+    data: {}
   - action: scene.turn_on
     metadata: {}
     data: {}
     target:
-      entity_id: scene.powerview_hub_kitchen_open
+      entity_id:
+      - scene.powerview_hub_kitchen_open_2
+      - scene.powerview_hub_family_room_open
+    enabled: true
   - action: input_number.set_value
     metadata: {}
     target:
       entity_id: input_number.kitchen_shade_position
     data:
       value: 100
+    enabled: true
   mode: single
 - id: '1763903166691'
   alias: Family room channel change
@@ -99,7 +107,7 @@
     metadata: {}
     data: {}
 - id: '1765397415014'
-  alias: Bird feeder up after sunset
+  alias: 'Bird Feeder: Raise Up After Sunset'
   description: ''
   triggers:
   - trigger: sun
@@ -128,7 +136,7 @@
   - delay:
       hours: 0
       minutes: 0
-      seconds: 20
+      seconds: 19
       milliseconds: 0
   - action: switch.turn_off
     metadata: {}
@@ -137,7 +145,7 @@
     data: {}
   mode: single
 - id: '1765403951885'
-  alias: Bird feeder down before sunrise
+  alias: 'Bird Feeder: Lower Down Before Sunrise'
   description: ''
   triggers:
   - trigger: sun
@@ -158,7 +166,7 @@
   - delay:
       hours: 0
       minutes: 0
-      seconds: 2
+      seconds: 1
       milliseconds: 0
   - action: switch.turn_on
     metadata: {}
@@ -171,7 +179,11 @@
       entity_id: 27308cdbe1c853dd7cd821bb720fbc92
       domain: binary_sensor
       trigger: device
-    timeout: 00:00:20
+    timeout:
+      hours: 0
+      minutes: 0
+      seconds: 19
+      milliseconds: 0
     continue_on_timeout: true
   - action: switch.turn_off
     metadata: {}
@@ -184,43 +196,14 @@
       entity_id: switch.bird_feeder_reverse
     data: {}
   mode: single
-- id: '1765671498604'
-  alias: Family room shades partially close
-  description: ''
-  triggers:
-  - trigger: time
-    at: '10:00:00'
-  conditions:
-  - condition: numeric_state
-    entity_id: sensor.openweathermap_cloud_coverage
-    below: 50
-  actions:
-  - action: scene.turn_on
-    metadata: {}
-    target:
-      entity_id: scene.powerview_hub_tv_watching
-    data: {}
-  - action: cover.set_cover_position
-    metadata: {}
-    data:
-      position: 50
-    target:
-      entity_id: cover.mock_shade_family_room
-  - action: input_number.set_value
-    metadata: {}
-    target:
-      entity_id: input_number.family_room_shade_position
-    data:
-      value: 50
-  mode: single
 - id: '1765825990365'
   alias: Family room shades sun lowers
   description: ''
   triggers:
   - trigger: numeric_state
     entity_id:
-    - sensor.sun_elevation
-    below: 20
+    - sensor.sun_incidence_angle_family_room_windows
+    above: 42
   conditions:
   - condition: template
     value_template: "{{ this.attributes.last_triggered is none\n   or this.attributes.last_triggered.date()
@@ -233,42 +216,22 @@
   - action: script.family_room_shades_open
     data: {}
   mode: single
-- id: '1765851454952'
-  alias: Wallbox Lexus sync transaction ID
-  description: ''
-  triggers:
-  - trigger: state
-    entity_id:
-    - sensor.wallbox_lexus_transaction_id
-  conditions:
-  - condition: state
-    state:
-    - unavailable
-    - unknown
-    entity_id: sensor.wallbox_lexus_transaction_id
-  actions:
-  - action: input_number.set_value
-    metadata: {}
-    target:
-      entity_id: input_number.wb02_transaction_id
-    data: {}
-  mode: single
 - id: '1766080721227'
   alias: Family room shades sun block
   description: ''
   triggers:
   - trigger: numeric_state
     entity_id:
-    - sensor.sun_elevation
-    above: 20
+    - sensor.sun_incidence_angle_family_room_windows
+    below: 42
   - trigger: numeric_state
     entity_id:
     - sensor.openweathermap_cloud_coverage
     below: 20
   conditions:
   - condition: numeric_state
-    entity_id: sensor.sun_elevation
-    above: 20
+    entity_id: sensor.sun_incidence_angle_family_room_windows
+    below: 42
   - condition: numeric_state
     entity_id: sensor.openweathermap_cloud_coverage
     below: 20
@@ -281,13 +244,12 @@
     data: {}
   mode: single
 - id: '1766150245927'
-  alias: Grid status changed
+  alias: 'Powerwall: Grid Status Changed'
   description: ''
   triggers:
   - trigger: state
     entity_id:
     - sensor.powerwall_grid_status
-    to:
   conditions: []
   actions:
   - action: notify.mobile_app_pixel_9
@@ -316,3 +278,212 @@
     data:
       message: Power usage above 0.5
   mode: single
+- id: '1767293253311'
+  alias: 'Master Bath: Shades Up'
+  description: ''
+  triggers:
+  - device_id: e328483ff6a4f35e31540e4c7a3aa55f
+    domain: hubitat
+    type: pushed
+    subtype: '1'
+    trigger: device
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: "{{ states('cover.master_bath_backyard_shade')|int\n   !=
+          states('input_number.master_bath_backyard_target')|int }}\n"
+      sequence:
+      - action: cover.stop_cover
+        metadata: {}
+        target:
+          entity_id: cover.master_bath_backyard
+        data: {}
+      alias: Backyard shade is moving
+    - conditions:
+      - condition: device
+        device_id: 08b63cf1cc5fdc1d5f18265ae085795a
+        domain: cover
+        entity_id: c0c2785d57325ebe1380c7df4c81a869
+        type: is_position
+        below: 5
+        above: 2
+      sequence:
+      - action: cover.open_cover
+        metadata: {}
+        target:
+          entity_id: cover.master_bath_backyard
+        data: {}
+      - action: input_number.set_value
+        metadata: {}
+        target:
+          entity_id: input_number.master_bath_backyard_shade_target
+        data:
+          value: 100
+      alias: Shades are striped
+    - conditions:
+      - condition: device
+        device_id: 08b63cf1cc5fdc1d5f18265ae085795a
+        domain: cover
+        entity_id: c0c2785d57325ebe1380c7df4c81a869
+        type: is_position
+        above: 10
+      - condition: device
+        device_id: b199d1588b8d92c5d065d1e356b7ed6e
+        domain: cover
+        entity_id: 294ac1ed7cf6abdbfb49c8118338d8ef
+        type: is_position
+        below: 50
+      sequence:
+      - action: cover.open_cover
+        metadata: {}
+        target:
+          entity_id: cover.master_bath_side_yard
+        data: {}
+      alias: Backyard shade is open
+    - conditions:
+      - condition: device
+        device_id: 08b63cf1cc5fdc1d5f18265ae085795a
+        domain: cover
+        entity_id: c0c2785d57325ebe1380c7df4c81a869
+        type: is_position
+        below: 3
+      sequence:
+      - action: scene.turn_on
+        metadata: {}
+        target:
+          entity_id: scene.powerview_hub_filtered_sun
+        data: {}
+      - action: input_number.set_value
+        metadata: {}
+        target:
+          entity_id: input_number.master_bath_backyard_shade_target
+        data:
+          value: 2
+      alias: Shades are closed
+  mode: single
+- id: '1767314349548'
+  alias: 'Master Bath: Shades Down'
+  description: ''
+  triggers:
+  - device_id: e328483ff6a4f35e31540e4c7a3aa55f
+    domain: hubitat
+    type: pushed
+    subtype: '2'
+    trigger: device
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: device
+        device_id: 08b63cf1cc5fdc1d5f18265ae085795a
+        domain: cover
+        entity_id: c0c2785d57325ebe1380c7df4c81a869
+        type: is_position
+        above: 5
+      sequence:
+      - action: scene.turn_on
+        metadata: {}
+        target:
+          entity_id: scene.powerview_hub_filtered_sun
+        data: {}
+      alias: Shades are open
+    - conditions:
+      - condition: device
+        device_id: 08b63cf1cc5fdc1d5f18265ae085795a
+        domain: cover
+        entity_id: c0c2785d57325ebe1380c7df4c81a869
+        type: is_position
+        below: 5
+        above: 0
+      sequence:
+      - action: scene.turn_on
+        metadata: {}
+        target:
+          entity_id: scene.powerview_hub_master_bath_close
+        data: {}
+      alias: Shades are striped
+  mode: single
+- id: '1767449019448'
+  alias: 'Powerwall: Solar Optimization & Storm Override'
+  description: Optimizes solar storage unless Manual Override is active.
+  triggers:
+  - entity_id:
+    - switch.powerwall_storm_watch
+    id: storm_change
+    trigger: state
+  - event: sunrise
+    id: day_mode
+    trigger: sun
+  - entity_id: input_boolean.powerwall_manual_override
+    to: 'off'
+    id: override_turned_off
+    trigger: state
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.powerwall_manual_override
+        state: 'on'
+      sequence:
+      - stop: Manual Override is active. Automation paused.
+    - conditions:
+      - condition: state
+        entity_id: switch.powerwall_storm_watch
+        state:
+        - 'on'
+      sequence:
+      - target:
+          entity_id:
+          - number.powerwall_backup_reserve
+        data:
+          value: 100
+        action: number.set_value
+      - target:
+          entity_id:
+          - select.powerwall_operation_mode
+        data:
+          option: backup_only
+        action: select.select_option
+    - conditions:
+      - condition: state
+        entity_id: switch.powerwall_storm_watch
+        state:
+        - 'off'
+      sequence:
+      - target:
+          entity_id:
+          - select.powerwall_operation_mode
+        data:
+          option: self_consumption
+        action: select.select_option
+      - target:
+          entity_id:
+          - number.powerwall_backup_reserve
+        data:
+          value: 20
+        action: number.set_value
+  mode: restart
+- id: '1767449822544'
+  alias: 'Powerwall: Alert if Grid Charging is Disabled'
+  description: Pings your phone if the setting needed for Stormwatch is turned off.
+  triggers:
+  - entity_id: switch.tesla_powerwall_allow_charging_from_grid
+    to: 'off'
+    for:
+      minutes: 5
+    trigger: state
+  conditions:
+  - condition: state
+    entity_id: input_boolean.powerwall_manual_override
+    state: 'off'
+  actions:
+  - data:
+      title: ⚠️ Powerwall Configuration Issue
+      message: Grid Charging has been disabled. Stormwatch will NOT be able to charge
+        your battery from the grid if an outage is predicted.
+      data:
+        priority: high
+        clickAction: /lovelace-energy
+    action: notify.mobile_app_your_phone_name
