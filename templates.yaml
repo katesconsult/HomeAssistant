@@ -1,4 +1,246 @@
 # Include various entities defined as templates
-- cover: !include covers.yaml
-- sensor: !include sensors.yaml
-- switch: !include switches.yaml
+#- binary_sensor: !include alexa.yaml
+#- cover: !include covers.yaml
+#- sensor: !include sensors.yaml
+#- switch: !include switches.yaml
+
+# Family room shades
+- cover:
+  - name: Family Room Shades
+    unique_id: mock_shade_family_room
+    set_cover_position:
+    - data:
+        value: '{{ position }}'
+      target:
+        entity_id:
+        - input_number.family_room_shade_position
+      action: input_number.set_value
+    open_cover:
+    - data:
+        value: 100
+      target:
+        entity_id:
+        - input_number.family_room_shade_position
+      service: script.family_room_shades_open
+    close_cover:
+    - data:
+        value: 0
+      target:
+        entity_id:
+        - input_number.family_room_shade_position
+      service: script.family_room_shades_close
+    stop_cover:
+    - data:
+        value: '{{ states(''input_number.family_room_shade_position'') }}'
+      target:
+        entity_id:
+        - input_number.family_room_shade_position
+      action: input_number.set_value
+    position: '{{ states(''input_number.family_room_shade_position'') | int }}'
+
+# Kitchen shades
+- cover:
+  - name: Kitchen Shades
+    unique_id: mock_shade_kitchen
+    set_cover_position:
+    - data:
+        value: '{{ position }}'
+      target:
+        entity_id:
+        - input_number.kitchen_shade_position
+      action: input_number.set_value
+    open_cover:
+    - data:
+        value: 100
+      target:
+        entity_id:
+        - input_number.kitchen_shade_position
+      service: script.kitchen_shades_open
+    close_cover:
+    - data:
+        value: 0
+      target:
+        entity_id:
+        - input_number.kitchen_shade_position
+      service: script.kitchen_shades_close
+    stop_cover:
+    - data:
+        value: '{{ states(''input_number.kitchen_shade_position'') }}'
+      target:
+        entity_id:
+        - input_number.kitchen_shade_position
+      action: input_number.set_value
+    position: '{{ states(''input_number.kitchen_shade_position'') | int }}'
+
+
+# Update OpenWeatherMap forecast ever 15 minutes
+- trigger:
+  - platform: time_pattern
+    #hours: "/1"  # Updates every hour
+    minutes: "/15"  # Updates every 15 minutes
+  - platform: homeassistant
+    event: start
+  action:
+  - action: weather.get_forecasts
+    data:
+      type: hourly
+    target:
+      entity_id: weather.openweathermap
+    response_variable: hourly_data
+  sensor:
+  - name: "OWM Hourly Forecast"
+    unique_id: owm_hourly_forecast
+    state: "{{ now().isoformat() }}" # State is just the last update time
+    attributes:
+      # This stores the entire hourly list in an attribute
+      forecast: "{{ hourly_data['weather.openweathermap'].forecast }}"
+
+
+# Get historical weather data from Meteo REST API
+- trigger:
+  - platform: time_pattern
+    hours: "/6"  # Updates every 6 hours
+  - platform: homeassistant
+    event: start
+  action:
+    - action: rest_command.meteostat_daily
+      data:
+        time_zone: "America%2FDenver"    
+        latitude: "{{ state_attr('zone.home', 'latitude') }}"
+        longitude: "{{ state_attr('zone.home', 'longitude') }}"
+        #altitude: "{{ state_attr('zone.home', 'elevation') }}"
+        start_date: "{{ (now() - timedelta(days=30)).strftime('%Y-%m-%d') }}"
+        #end_date: "{{ (now() - timedelta(days=5)).strftime('%Y-%m-%d') }}"
+        end_date: "{{ now().strftime('%Y-%m-%d') }}"
+      response_variable: meteostat_raw
+    # Log raw response to system_log
+    - action: system_log.write
+      data:
+        level: info
+        message: "Meteostat RAW Response: {{ meteostat_raw }}"
+        logger: custom_rest_debug
+  sensor:
+    - name: "Meteostat Daily Records"
+      unique_id: meteostat_daily
+      state: "{{ now().isoformat() }}"
+      attributes:
+        # This stores the 'data' array from the API response
+        records: >
+          {% if meteostat_raw['content'] is defined and 'data' in meteostat_raw['content'] %}
+            {{ meteostat_raw['content']['data'] }}
+          {% else %}
+            {{ state_attr('sensor.meteostat_daily', 'records') or [] }}
+          {% endif %}
+          
+          
+- trigger:
+  - platform: time_pattern
+    hours: "/6"  # Updates every 6 hours
+  - platform: homeassistant
+    event: start
+  action:
+    - action: rest_command.meteostat_hourly
+      data:
+        station_code: "KLMO0"
+        #station_code: "72476"
+        time_zone: "America%2FDenver"
+        start_date: "{{ (now() - timedelta(days=2)).strftime('%Y-%m-%d') }}"
+        end_date: "{{ now().strftime('%Y-%m-%d') }}"
+      response_variable: meteostat_raw
+    # Log raw response to system_log
+    - action: system_log.write
+      data:
+        level: info
+        message: "Meteostat RAW Response: {{ meteostat_raw }}"
+        logger: custom_rest_debug
+  sensor:
+    - name: "Meteostat Hourly Records"
+      unique_id: meteostat_hourly
+      state: "{{ now().isoformat() }}"
+      attributes:
+        # This stores the 'data' array from the API response
+        records: >
+          {% if meteostat_raw['content'] is defined and 'data' in meteostat_raw['content'] %}
+            {{ meteostat_raw['content']['data'] }}
+          {% else %}
+            {{ state_attr('sensor.meteostat_hourly', 'records') or [] }}
+          {% endif %}
+
+- sensor:
+    - name: "Meteostat Daily Summary"
+      unique_id: meteostat_daily_summary
+      state: "{{ now().isoformat() }}"
+      attributes:
+        days: >
+          {% set hourly_data = state_attr('sensor.meteostat_hourly', 'records') %}
+          {% if hourly_data is iterable and hourly_data | count > 0 %}
+            {# 1. Check if we have 'temp' (Hourly) or 'tmax' (Daily) keys #}
+            {% set is_hourly = 'temp' in hourly_data[0] %}
+            
+            {% if is_hourly %}
+              {# LOGIC FOR HOURLY DATA: Grouping hours into days #}
+              {% set dates = hourly_data | map(attribute='time') | map('truncate', 10, True, '') | unique | list %}
+              {% set ns = namespace(days=[]) %}
+              {% for d in dates %}
+                {% set day_items = hourly_data | selectattr('time', 'search', d) | list %}
+                {% set temps = day_items | map(attribute='temp') | select('number') | list %}
+                {% set prcps = day_items | map(attribute='prcp') | select('number') | list %}
+                
+                {% set ns.days = ns.days + [{
+                  "date": d ~ " 00:00:00",
+                  "tmin": temps | min if temps else 'N/A',
+                  "tmax": temps | max if temps else 'N/A',
+                  "prcp": prcps | sum | round(2) if prcps else 0,
+                  "count_hours": day_items | count
+                }] %}
+              {% endfor %}
+              {{ ns.days }}
+            {% else %}
+              {# FALLBACK: If the API sends Daily data anyway, just format it #}
+              {% set ns = namespace(days=[]) %}
+              {% for item in hourly_data if item.tmin is not none %}
+                {% set ns.days = ns.days + [{
+                  "date": item.date,
+                  "tmin": item.tmin | default(0),
+                  "tmax": item.tmax | default(0),
+                  "prcp": item.prcp | default(0),
+                  "tavg": item.tavg
+                }] %}
+              {% endfor %}
+              {{ ns.days }}
+            {% endif %}
+          {% else %}
+            {{ [] }}
+          {% endif %}
+
+- sensor:
+    - name: "Meteostat Unified Daily"
+      unique_id: meteostat_unified_daily
+      state: "{{ now().isoformat() }}"
+      attributes:
+        records: >
+          {% set hist = state_attr('sensor.meteostat_daily', 'records') or [] %}
+          {% set recent = state_attr('sensor.meteostat_daily_summary', 'days') or [] %}
+          
+          {# Find the first record where tmin is null #}
+          {% set break_record = hist | selectattr('tmin', 'none') | first | default(none) %}
+          
+          {% if break_record is not none %}
+            {% set cutoff = break_record.date %}
+            
+            {# Filter and truncate dates to 10 chars (YYYY-MM-DD) #}
+            {% set filtered_hist = hist | selectattr('date', 'lt', cutoff) | list %}
+            {% set filtered_recent = recent | selectattr('date', 'ge', cutoff) | list %}
+            
+            {% set combined = filtered_hist + filtered_recent %}
+            
+            {# Re-map the list to clean the date strings #}
+            {% set ns = namespace(clean=[]) %}
+            {% for r in combined %}
+              {% set ns.clean = ns.clean + [ dict(r, date=r.date[:10]) ] %}
+            {% endfor %}
+            
+            {{ ns.clean | sort(attribute='date') }}
+          {% else %}
+            {{ hist | sort(attribute='date') }}
+          {% endif %}

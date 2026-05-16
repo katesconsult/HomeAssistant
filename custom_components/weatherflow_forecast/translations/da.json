@@ -1,0 +1,113 @@
+{
+    "config": {
+        "abort": {
+            "unique_id": "WeatherFlow Station er allerede konfigureret."
+        },
+        "error": {
+            "wrong_station_id": "ID på stationen er ikke korrekt. Tjek at der ikke bruges Device ID.",
+            "server_error": "WeatherFlow serverne har en intern fejl.",
+            "wrong_token": "Api Token er ikke korrekt eller matcher ikke Station ID.",
+            "offline_error": "Stationen er enten offline eller har ingen nylige observationer. Tjek stationens status eller fjern sensorer og prøv igen.",
+            "bad_request": "Der opstod en uventet fejl under hentning af data."
+        },
+        "step": {
+            "user": {
+                "description": "Konfigurer en WeatherFlow Forecast Station",
+                "title": "WeatherFlow Forecast",
+                "data": {
+                    "station_id": "Station Id",
+                    "api_token": "Personlig Api Token",
+                    "forecast_hours": "Timer der vises i den timebaserede vejrudsigt",
+                    "add_sensors": "Tilføj sensorer fra vejrstationen"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "api_token": "Personlig Api Token",
+                    "forecast_hours": "Timer der vises i den timebaserede vejrudsigt",
+                    "add_sensors": "Tilføj sensorer fra vejrstationen"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "wind_cardinal": {
+                "state": {
+                    "n": "N",
+                    "nne": "NNØ",
+                    "ne": "NØ",
+                    "ene": "ØNØ",
+                    "e": "Ø",
+                    "ese": "ØSØ",
+                    "se": "SØ",
+                    "sse": "SSØ",
+                    "s": "S",
+                    "ssw": "SSV",
+                    "sw": "SV",
+                    "wsw": "VSV",
+                    "w": "V",
+                    "wnw": "VNV",
+                    "nw": "NV",
+                    "nnw": "NNV"
+                }
+            },
+            "pressure_trend": {
+                "state": {
+                    "falling": "Falder",
+                    "rising": "Stiger",
+                    "steady": "Stabil"
+                }
+            },
+            "precipitation_type": {
+                "state": {
+                    "no_rain": "Tørt",
+                    "rain": "Regn",
+                    "heavy_rain": "Kraftig regn/Hagl"
+                }
+            },
+            "beaufort": {
+                "state": {
+                    "calm": "Stille",
+                    "light_air": "Næsten stille",
+                    "light_breeze": "Svag vind",
+                    "gentle_breeze": "Let vind",
+                    "moderate_breeze": "Jævn vind",
+                    "fresh_breeze": "Frisk vind",
+                    "strong_breeze": "Hård vind",
+                    "moderate_gale": "Stiv kuling",
+                    "fresh_gale": "Hård kuling",
+                    "strong_gale": "Stormende kuling",
+                    "storm": "Storm",
+                    "violent_storm": "Stærk storm",
+                    "hurricane": "Orkan"
+                }
+            },
+            "precip_intensity": {
+                "state": {
+                    "no_rain": "Ingen",
+                    "very_light": "Meget Let",
+                    "light": "Let",
+                    "moderate": "Moderat",
+                    "heavy": "Kraftig",
+                    "very_heavy": "Meget Kraftig",
+                    "extreme": "Ekstrem"
+                }
+            },
+            "uv_description": {
+                "state": {
+                    "extreme": "Ekstrem høj",
+                    "very-high": "Meget høj",
+                    "high": "Høj",
+                    "moderate": "Moderat",
+                    "low": "Lav",
+                    "none": "Ingen data"
+                }
+            }
+        }
+    }
+}

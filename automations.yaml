@@ -1,5 +1,5 @@
 - id: '1763422513906'
-  alias: Family room shades close
+  alias: 'PowerView: Main Floor Shades Close in Evening'
   description: ''
   triggers:
   - trigger: state
@@ -15,54 +15,23 @@
   - action: script.family_room_shades_close
     metadata: {}
     data: {}
-  mode: single
-- id: '1763422572511'
-  alias: Family room shades open
-  description: ''
-  triggers:
-  - trigger: state
-    entity_id:
-    - cover.mock_shade_family_room
-    to:
-    - open
-  - trigger: sun
-    event: sunrise
-    offset: -00:25:00
-  conditions: []
-  actions:
-  - action: script.family_room_shades_open
+  - action: script.kitchen_shades_close
     metadata: {}
     data: {}
-  mode: single
-- id: '1763424478812'
-  alias: Kitchen shades close
-  description: ''
-  triggers:
-  - trigger: state
-    entity_id:
-    - cover.mock_shade_kitchen
-    to:
-    - closed
-  - trigger: sun
-    event: sunset
-    offset: 0:15:00
-  conditions: []
-  actions:
-  - action: scene.turn_on
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 15
+      milliseconds: 0
+  - action: script.family_room_shades_close
     metadata: {}
     data: {}
-    target:
-      entity_id:
-      - scene.powerview_hub_kitchen_close_2
-  - action: input_number.set_value
+  - action: script.kitchen_shades_close
     metadata: {}
-    target:
-      entity_id: input_number.kitchen_shade_position
-    data:
-      value: 0
+    data: {}
   mode: single
 - id: '1763424536260'
-  alias: 'PowerView: Shades Open Before Sunrise'
+  alias: 'PowerView: Main Floor Shades Open in Morning'
   description: ''
   triggers:
   - trigger: state
@@ -78,132 +47,117 @@
   - action: script.family_room_shades_open
     metadata: {}
     data: {}
-  - action: scene.turn_on
+  - action: script.kitchen_shades_open
     metadata: {}
     data: {}
-    target:
-      entity_id:
-      - scene.powerview_hub_kitchen_open_2
-      - scene.powerview_hub_family_room_open
-    enabled: true
-  - action: input_number.set_value
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 15
+      milliseconds: 0
+  - action: script.family_room_shades_open
     metadata: {}
-    target:
-      entity_id: input_number.kitchen_shade_position
-    data:
-      value: 100
-    enabled: true
+    data: {}
+  - action: script.kitchen_shades_open
+    metadata: {}
+    data: {}
   mode: single
-- id: '1763903166691'
-  alias: Family room channel change
-  description: ''
-  triggers:
-  - trigger: state
-    entity_id:
-    - input_select.family_room_tv_channel
-  conditions: []
-  actions:
-  - action: script.select_channel_family_room
-    metadata: {}
-    data: {}
 - id: '1765397415014'
-  alias: 'Bird Feeder: Raise Up After Sunset'
+  alias: 'Bird Feeder: Raise Up in Evening'
   description: ''
   triggers:
   - trigger: sun
     event: sunset
-    offset: 0:30:00
+    offset: -0:10:00
   conditions:
   - condition: numeric_state
-    entity_id: sensor.niwot_overnight_low
+    entity_id: number.weather_overnight_low
     above: 32
-  - type: is_not_open
-    condition: device
-    device_id: 4447d55956d7f6b0ecda504335bf87c4
-    entity_id: 27308cdbe1c853dd7cd821bb720fbc92
-    domain: binary_sensor
+  - condition: state
+    entity_id: binary_sensor.bird_feeder_open_close_sensor
+    state:
+    - 'off'
   actions:
-  - action: switch.turn_off
+  - action: input_number.set_value
     metadata: {}
     target:
-      entity_id: switch.bird_feeder_reverse
-    data: {}
-  - action: switch.turn_on
-    metadata: {}
-    target:
-      entity_id: switch.bird_feeder_power
-    data: {}
-  - delay:
-      hours: 0
-      minutes: 0
-      seconds: 19
-      milliseconds: 0
-  - action: switch.turn_off
-    metadata: {}
-    target:
-      entity_id: switch.bird_feeder_power
-    data: {}
+      entity_id: input_number.bird_feeder_retry_counter
+    data:
+      value: 2
+  - repeat:
+      while:
+      - condition: state
+        entity_id: binary_sensor.bird_feeder_open_close_sensor
+        state:
+        - 'off'
+      - condition: numeric_state
+        entity_id: input_number.bird_feeder_retry_counter
+        above: 0
+      sequence:
+      - action: script.bird_feeder_up
+        metadata: {}
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 1
+          seconds: 0
+          milliseconds: 0
+      - action: input_number.decrement
+        metadata: {}
+        target:
+          entity_id: input_number.bird_feeder_retry_counter
+        data: {}
   mode: single
 - id: '1765403951885'
-  alias: 'Bird Feeder: Lower Down Before Sunrise'
+  alias: 'Bird Feeder: Lower Down At Sunrise'
   description: ''
   triggers:
   - trigger: sun
     event: sunrise
-    offset: -0:30:00
   conditions:
-  - type: is_open
-    condition: device
-    device_id: 4447d55956d7f6b0ecda504335bf87c4
-    entity_id: 27308cdbe1c853dd7cd821bb720fbc92
-    domain: binary_sensor
+  - condition: state
+    entity_id: switch.bird_feeder_reverse
+    state:
+    - 'off'
   actions:
-  - action: switch.turn_on
+  - action: input_number.set_value
     metadata: {}
     target:
-      entity_id: switch.bird_feeder_reverse
-    data: {}
-  - delay:
-      hours: 0
-      minutes: 0
-      seconds: 1
-      milliseconds: 0
-  - action: switch.turn_on
-    metadata: {}
-    target:
-      entity_id: switch.bird_feeder_power
-    data: {}
-  - wait_for_trigger:
-    - type: not_opened
-      device_id: 4447d55956d7f6b0ecda504335bf87c4
-      entity_id: 27308cdbe1c853dd7cd821bb720fbc92
-      domain: binary_sensor
-      trigger: device
-    timeout:
-      hours: 0
-      minutes: 0
-      seconds: 19
-      milliseconds: 0
-    continue_on_timeout: true
-  - action: switch.turn_off
-    metadata: {}
-    target:
-      entity_id: switch.bird_feeder_power
-    data: {}
-  - action: switch.turn_off
-    metadata: {}
-    target:
-      entity_id: switch.bird_feeder_reverse
-    data: {}
+      entity_id: input_number.bird_feeder_retry_counter
+    data:
+      value: 2
+  - repeat:
+      while:
+      - condition: state
+        entity_id: binary_sensor.bird_feeder_open_close_sensor
+        state:
+        - 'on'
+      - condition: numeric_state
+        entity_id: input_number.bird_feeder_retry_counter
+        above: 0
+      sequence:
+      - action: script.bird_feeder_down
+        metadata: {}
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 1
+          seconds: 0
+          milliseconds: 0
+      - action: input_number.decrement
+        metadata: {}
+        target:
+          entity_id: input_number.bird_feeder_retry_counter
+        data: {}
   mode: single
 - id: '1765825990365'
-  alias: Family room shades sun lowers
+  alias: 'PowerView: Family Room Shades Up When Sun Lower'
   description: ''
   triggers:
   - trigger: numeric_state
     entity_id:
-    - sensor.sun_incidence_angle_family_room_windows
-    above: 42
+    - sensor.sun_incidence_family_room
+    above: 45
   conditions:
   - condition: template
     value_template: "{{ this.attributes.last_triggered is none\n   or this.attributes.last_triggered.date()
@@ -217,21 +171,17 @@
     data: {}
   mode: single
 - id: '1766080721227'
-  alias: Family room shades sun block
+  alias: 'PowerView: Family Room Shades Down to Block Sun'
   description: ''
   triggers:
   - trigger: numeric_state
     entity_id:
-    - sensor.sun_incidence_angle_family_room_windows
-    below: 42
-  - trigger: numeric_state
-    entity_id:
-    - sensor.openweathermap_cloud_coverage
-    below: 20
+    - sensor.sun_azimuth
+    above: 120
   conditions:
   - condition: numeric_state
-    entity_id: sensor.sun_incidence_angle_family_room_windows
-    below: 42
+    entity_id: sensor.sun_incidence_family_room
+    below: 50
   - condition: numeric_state
     entity_id: sensor.openweathermap_cloud_coverage
     below: 20
@@ -244,12 +194,16 @@
     data: {}
   mode: single
 - id: '1766150245927'
-  alias: 'Powerwall: Grid Status Changed'
+  alias: 'Powerwall: Grid Goes Down'
   description: ''
   triggers:
   - trigger: state
     entity_id:
     - sensor.powerwall_grid_status
+    to:
+    - off_grid
+    - off_grid_intentional
+    - off_grid_unintentional
   conditions: []
   actions:
   - action: notify.mobile_app_pixel_9
@@ -257,50 +211,32 @@
     data:
       message: '{{ trigger.to_state.name }} changed from {{ trigger.from_state.state
         }} to {{ trigger.to_state.state }}'
-  mode: single
-- id: '1766152038357'
-  alias: Grid power usage high during outage
-  description: ''
-  triggers:
-  - trigger: numeric_state
-    entity_id:
-    - sensor.powerwall_home_usage
-    above: 0.5
-  conditions:
-  - condition: state
-    entity_id: sensor.powerwall_grid_status
-    state:
-    - off_grid_intentional
-    - off_grid
-  actions:
-  - action: notify.mobile_app_pixel_9
-    metadata: {}
-    data:
-      message: Power usage above 0.5
+  - type: turn_off
+    device_id: bca9d84530d4743e167706c82b4adf23
+    entity_id: e307600ea6c8e7787c802cf2ee7bd150
+    domain: switch
+  - type: turn_off
+    device_id: 64c96df879579eec6dd717e37814a968
+    entity_id: dc036f3a87a192904cc20f02d2c1fd35
+    domain: switch
+  - type: turn_off
+    device_id: eaa0ab43f12463dcbe44cd87ff3ed000
+    entity_id: 23736c5765ab7281825cf88a61ba6e58
+    domain: light
   mode: single
 - id: '1767293253311'
-  alias: 'Master Bath: Shades Up'
+  alias: 'PowerView: Master Bath Shades Up'
   description: ''
   triggers:
-  - device_id: e328483ff6a4f35e31540e4c7a3aa55f
-    domain: hubitat
-    type: pushed
-    subtype: '1'
-    trigger: device
+  - trigger: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 50
+      command_class: 32
+      value: 255
   conditions: []
   actions:
   - choose:
-    - conditions:
-      - condition: template
-        value_template: "{{ states('cover.master_bath_backyard_shade')|int\n   !=
-          states('input_number.master_bath_backyard_target')|int }}\n"
-      sequence:
-      - action: cover.stop_cover
-        metadata: {}
-        target:
-          entity_id: cover.master_bath_backyard
-        data: {}
-      alias: Backyard shade is moving
     - conditions:
       - condition: device
         device_id: 08b63cf1cc5fdc1d5f18265ae085795a
@@ -315,12 +251,6 @@
         target:
           entity_id: cover.master_bath_backyard
         data: {}
-      - action: input_number.set_value
-        metadata: {}
-        target:
-          entity_id: input_number.master_bath_backyard_shade_target
-        data:
-          value: 100
       alias: Shades are striped
     - conditions:
       - condition: device
@@ -355,26 +285,40 @@
         target:
           entity_id: scene.powerview_hub_filtered_sun
         data: {}
-      - action: input_number.set_value
-        metadata: {}
-        target:
-          entity_id: input_number.master_bath_backyard_shade_target
-        data:
-          value: 2
       alias: Shades are closed
+  - action: timer.start
+    metadata: {}
+    target:
+      entity_id: timer.master_bath_shades_timer
+    data: {}
   mode: single
 - id: '1767314349548'
-  alias: 'Master Bath: Shades Down'
+  alias: 'PowerView: Master Bath Shades Down '
   description: ''
   triggers:
-  - device_id: e328483ff6a4f35e31540e4c7a3aa55f
-    domain: hubitat
-    type: pushed
-    subtype: '2'
-    trigger: device
+  - trigger: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 50
+      command_class: 32
+      value: 0
   conditions: []
   actions:
   - choose:
+    - conditions:
+      - condition: state
+        entity_id: timer.master_bath_shades_timer
+        state:
+        - active
+      sequence:
+      - action: cover.stop_cover
+        metadata: {}
+        target:
+          entity_id:
+          - cover.master_bath_backyard
+          - cover.master_bath_side_yard
+        data: {}
+      alias: 'Shades moving '
     - conditions:
       - condition: device
         device_id: 08b63cf1cc5fdc1d5f18265ae085795a
@@ -405,85 +349,1882 @@
         data: {}
       alias: Shades are striped
   mode: single
-- id: '1767449019448'
-  alias: 'Powerwall: Solar Optimization & Storm Override'
-  description: Optimizes solar storage unless Manual Override is active.
+- id: '1768060963607'
+  alias: 'Door Lock: Garage Door Entry Nightly '
+  description: ''
+  triggers:
+  - trigger: time
+    at: '22:00:00'
+  conditions: []
+  actions:
+  - action: script.lock_garage_door_entry
+    metadata: {}
+    data: {}
+  mode: single
+- id: '1768104417533'
+  alias: 'Wallbox Tesla: Start Charging on Plug-In with TOU Logic'
+  description: Starts charging on plug-in, delaying if during peak hours (5pm-9pm
+    weekdays).
   triggers:
   - entity_id:
-    - switch.powerwall_storm_watch
-    id: storm_change
+    - sensor.wallbox_tesla_status_connector
     trigger: state
-  - event: sunrise
-    id: day_mode
-    trigger: sun
-  - entity_id: input_boolean.powerwall_manual_override
-    to: 'off'
-    id: override_turned_off
+    to:
+    - Preparing
+  conditions:
+  - condition: state
+    entity_id: switch.wallbox_tesla_charge_control
+    state: 'off'
+  actions:
+  - choose:
+    - conditions:
+      - condition: time
+        after: '17:00:00'
+        before: '21:00:00'
+        weekday:
+        - mon
+        - tue
+        - wed
+        - thu
+        - fri
+      sequence:
+      - wait_for_trigger:
+        - at: '21:00:00'
+          trigger: time
+      - target:
+          entity_id: switch.wallbox_tesla_charge_control
+        action: switch.turn_on
+    default:
+    - target:
+        entity_id: switch.wallbox_tesla_charge_control
+      action: switch.turn_on
+  mode: restart
+- id: '1768250624789'
+  alias: 'Wallbox Lexus: Start Charging on Plug-In'
+  description: Starts charging on plug-in, delaying if during peak hours (5pm-9pm
+    weekdays).
+  triggers:
+  - entity_id:
+    - sensor.wallbox_lexus_status_connector
     trigger: state
+    to:
+    - Preparing
+  conditions:
+  - condition: state
+    entity_id: switch.wallbox_lexus_charge_control
+    state:
+    - 'off'
+  actions:
+  - action: input_boolean.turn_off
+    metadata: {}
+    target:
+      entity_id: input_boolean.wallbox_lexus_charging_complete
+    data: {}
+  - action: switch.turn_on
+    metadata: {}
+    target:
+      entity_id: switch.wallbox_lexus_charge_control
+    data: {}
+  mode: restart
+- id: '1768257641164'
+  alias: 'Wallbox Lexus: Charging Complete'
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.wallbox_lexus_status_connector
+    to:
+    - SuspendedEV
+  conditions: []
+  actions:
+  - action: input_boolean.turn_on
+    metadata: {}
+    target:
+      entity_id: input_boolean.wallbox_lexus_charging_complete
+    data: {}
+  mode: single
+- id: '1768257847919'
+  alias: 'Wallbox Lexus: Charging Status Changed'
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.wallbox_lexus_status_connector
+  conditions: []
   actions:
   - choose:
     - conditions:
       - condition: state
-        entity_id: input_boolean.powerwall_manual_override
-        state: 'on'
-      sequence:
-      - stop: Manual Override is active. Automation paused.
+        entity_id: sensor.wallbox_lexus_status_connector
+        state:
+        - Available
+      sequence: []
     - conditions:
       - condition: state
-        entity_id: switch.powerwall_storm_watch
+        entity_id: sensor.wallbox_lexus_status_connector
         state:
-        - 'on'
+        - SuspendedEV
       sequence:
-      - target:
-          entity_id:
-          - number.powerwall_backup_reserve
+      - action: input_text.set_value
+        metadata: {}
+        target:
+          entity_id: input_text.wallbox_lexus_charging_mode
         data:
-          value: 100
-        action: number.set_value
-      - target:
-          entity_id:
-          - select.powerwall_operation_mode
-        data:
-          option: backup_only
-        action: select.select_option
+          value: Fully Charged
+      - action: input_boolean.turn_on
+        metadata: {}
+        target:
+          entity_id: input_boolean.wallbox_lexus_charging_complete
+        data: {}
     - conditions:
       - condition: state
-        entity_id: switch.powerwall_storm_watch
+        entity_id: sensor.wallbox_lexus_status_connector
         state:
-        - 'off'
+        - SuspendedEVSE
       sequence:
-      - target:
-          entity_id:
-          - select.powerwall_operation_mode
+      - action: input_text.set_value
+        metadata: {}
+        target:
+          entity_id: input_text.wallbox_lexus_charging_mode
         data:
-          option: self_consumption
-        action: select.select_option
-      - target:
-          entity_id:
-          - number.powerwall_backup_reserve
-        data:
-          value: 20
-        action: number.set_value
-  mode: restart
-- id: '1767449822544'
-  alias: 'Powerwall: Alert if Grid Charging is Disabled'
-  description: Pings your phone if the setting needed for Stormwatch is turned off.
+          value: Waiting...
+    default:
+    - action: input_text.set_value
+      metadata: {}
+      target:
+        entity_id: input_text.wallbox_lexus_charging_mode
+      data:
+        value: '{{ states(''sensor.wallbox_lexus_status_connector'') }}'
+  - action: input_text.set_value
+    metadata: {}
+    target:
+      entity_id: input_text.wallbox_lexus_charging_mode
+    data:
+      value: Unplugged
+  - action: input_boolean.turn_off
+    metadata: {}
+    target:
+      entity_id: input_boolean.wallbox_lexus_charging_complete
+    data: {}
+  mode: single
+- id: '1768257948981'
+  alias: 'Wallbox Tesla: Charging Complete'
+  description: ''
   triggers:
-  - entity_id: switch.tesla_powerwall_allow_charging_from_grid
-    to: 'off'
-    for:
-      minutes: 5
-    trigger: state
+  - trigger: state
+    entity_id:
+    - sensor.wallbox_tesla_status_connector
+    to:
+    - SuspendedEV
+  conditions: []
+  actions:
+  - action: input_boolean.turn_on
+    metadata: {}
+    target:
+      entity_id:
+      - input_boolean.wallbox_tesla_charging_complete
+    data: {}
+  mode: single
+- id: '1768425172475'
+  alias: YouTube TV channel select
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - input_select.youtube_tv_channel
+  conditions: []
+  actions:
+  - action: script.tv_channel_tuner
+    metadata: {}
+    data: {}
+  mode: single
+- id: '1768916517423'
+  alias: 'Powerwall: Set Backup Reserve to MIN at Peak TOU'
+  description: ''
+  triggers:
+  - trigger: time
+    at: '17:00:00'
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
   conditions:
   - condition: state
-    entity_id: input_boolean.powerwall_manual_override
-    state: 'off'
+    entity_id: binary_sensor.powerwall_storm_watch_active
+    state:
+    - 'off'
   actions:
-  - data:
-      title: ⚠️ Powerwall Configuration Issue
-      message: Grid Charging has been disabled. Stormwatch will NOT be able to charge
-        your battery from the grid if an outage is predicted.
+  - device_id: 855f1c1a786568331a4d3cae16e2505d
+    domain: select
+    entity_id: b61504b675a636ce97e188a960c10b1d
+    type: select_option
+    option: self_consumption
+    enabled: true
+  - device_id: 855f1c1a786568331a4d3cae16e2505d
+    domain: number
+    entity_id: d18cd685dc556d31a597cf44a49d448b
+    type: set_value
+    value: 30
+  mode: single
+- id: '1768956606757'
+  alias: 'Wallbox: Predictive Overnight Tesla Charging'
+  description: Starts charging at 2AM if conditions met, otherwise waits for solar.
+  triggers:
+  - at: 02:00:00
+    trigger: time
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.model_3_charge_cable
+        state: 'on'
+      - condition: or
+        conditions:
+        - condition: numeric_state
+          entity_id: sensor.solcast_pv_forecast_forecast_today
+          below: 20
+        - condition: state
+          entity_id: input_boolean.wallbox_tesla_charge_overnight
+          state:
+          - 'on'
+      sequence:
+      - target:
+          entity_id: switch.wallbox_tesla_charge_control
+        action: switch.turn_on
+    default:
+    - wait_for_trigger:
+      - entity_id: sensor.powerwall_solar_power
+        above: 0
+        trigger: numeric_state
+      timeout: '12:00:00'
+    - target:
+        entity_id: switch.wallbox_tesla_charge_control
+      action: switch.turn_on
+  mode: restart
+- id: '1768963958458'
+  alias: 'Wallbox: Predictive Overnight Tesla Charging TEST'
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - input_boolean.wallbox_tesla_charge_overnight
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.model_3_charge_cable
+        state: 'on'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: input_boolean.wallbox_tesla_charge_overnight
+          state:
+          - 'on'
+        - condition: and
+          conditions:
+          - condition: numeric_state
+            entity_id: sensor.model_3_battery_level
+            below: 60
+          - condition: numeric_state
+            entity_id: sensor.solcast_pv_forecast_forecast_tomorrow
+            above: 20
+      sequence:
+      - action: notify.mobile_app_pixel_9
+        metadata: {}
+        data:
+          message: Ready to charge Tesla
+- id: '1768999858234'
+  alias: 'Wallbox: Time of Use Suspend Charging'
+  description: ''
+  triggers:
+  - trigger: time
+    at: '16:45:00'
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+  conditions: []
+  actions:
+  - action: switch.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - switch.wallbox_tesla_charge_control
+      - switch.wallbox_lexus_charge_control
+  mode: single
+- id: '1769000395603'
+  alias: 'Wallbox: Predictive Overnight Lexus Charging'
+  description: Starts charging at 2AM if conditions met, otherwise waits for solar.
+  triggers:
+  - at: 02:00:00
+    trigger: time
+  conditions:
+  - condition: state
+    entity_id: sensor.wallbox_lexus_status_connector
+    state:
+    - Ready
+    - Preparing
+    - Available
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: sensor.wallbox_lexus_connectors
+        state: 'on'
+      - condition: or
+        conditions:
+        - condition: numeric_state
+          entity_id: sensor.solcast_pv_forecast_forecast_today
+          below: 20
+        - condition: state
+          entity_id: input_boolean.wallbox_lexus_charge_overnight
+          state:
+          - 'on'
+      sequence:
+      - target:
+          entity_id: switch.wallbox_tesla_charge_control
+        action: switch.turn_on
+    default:
+    - wait_for_trigger:
+      - entity_id: sensor.powerwall_solar_power
+        above: 0
+        trigger: numeric_state
+      timeout: '12:00:00'
+    - target:
+        entity_id:
+        - switch.wallbox_lexus_charge_control
+      action: switch.turn_on
+      data: {}
+  mode: restart
+- id: '1770384983975'
+  alias: 'OCPP: Auto-Dismiss Rejected Notifications'
+  description: Automatically clears persistent notifications from the OCPP integration
+  triggers:
+  - trigger: persistent_notification
+    update_type:
+    - added
+  conditions:
+  - condition: template
+    value_template: '{{ ''ocpp'' in trigger.notification.title | lower or ''ocpp''
+      in trigger.notification.message | lower }}'
+  actions:
+  - action: persistent_notification.dismiss
+    data:
+      notification_id: '{{ trigger.notification.notification_id }}'
+  mode: parallel
+  max: 10
+- id: '1770473274626'
+  alias: 'Wallbox Tesla: Charging Status Changed'
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.wallbox_tesla_status_connector
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: sensor.wallbox_tesla_status_connector
+        state:
+        - Available
+      sequence: []
+    - conditions:
+      - condition: state
+        entity_id: sensor.wallbox_tesla_status_connector
+        state:
+        - SuspendedEV
+      sequence:
+      - action: input_text.set_value
+        metadata: {}
+        target:
+          entity_id: input_text.wallbox_tesla_charging_mode
+        data:
+          value: Fully Charged
+      - action: input_boolean.turn_on
+        metadata: {}
+        target:
+          entity_id: input_boolean.wallbox_tesla_charging_complete
+        data: {}
+    - conditions:
+      - condition: state
+        entity_id: sensor.wallbox_tesla_status_connector
+        state:
+        - SuspendedEVSE
+      sequence:
+      - action: input_text.set_value
+        metadata: {}
+        target:
+          entity_id: input_text.wallbox_tesla_charging_mode
+        data:
+          value: Waiting...
+    default:
+    - action: input_text.set_value
+      metadata: {}
+      target:
+        entity_id: input_text.wallbox_tesla_charging_mode
       data:
-        priority: high
-        clickAction: /lovelace-energy
-    action: notify.mobile_app_your_phone_name
+        value: '{{ states(''sensor.wallbox_tesla_status_connector'') }}'
+  - action: input_text.set_value
+    metadata: {}
+    target:
+      entity_id: input_text.wallbox_tesla_charging_mode
+    data:
+      value: Unplugged
+  - action: input_boolean.turn_off
+    metadata: {}
+    target:
+      entity_id: input_boolean.wallbox_tesla_charging_complete
+    data: {}
+  mode: single
+- id: '1770674302454'
+  alias: 'Powerwall: Set Backup Reserve to MAX During Daytime '
+  description: ''
+  triggers:
+  - trigger: time
+    at: 02:00:00
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+  conditions: []
+  actions:
+  - device_id: 855f1c1a786568331a4d3cae16e2505d
+    domain: select
+    entity_id: b61504b675a636ce97e188a960c10b1d
+    type: select_option
+    option: self_consumption
+    enabled: true
+  - device_id: 855f1c1a786568331a4d3cae16e2505d
+    domain: number
+    entity_id: d18cd685dc556d31a597cf44a49d448b
+    type: set_value
+    value: 80
+  mode: single
+- id: '1770896091701'
+  alias: 'Powerwall: Dump Remaining Battery Before End Of Peak TOU'
+  description: ''
+  triggers:
+  - trigger: time
+    at: '20:30:00'
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.powerwall_storm_watch_active
+    state:
+    - 'off'
+  actions:
+  - device_id: 855f1c1a786568331a4d3cae16e2505d
+    domain: select
+    entity_id: b61504b675a636ce97e188a960c10b1d
+    type: select_option
+    option: autonomous
+    enabled: true
+  - device_id: 855f1c1a786568331a4d3cae16e2505d
+    domain: number
+    entity_id: d18cd685dc556d31a597cf44a49d448b
+    type: set_value
+    value: 30
+  mode: single
+- id: '1773281780505'
+  alias: 'Door Lock: Front Door Between Noon and 6am'
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - lock.front_door_lock
+    to:
+    - unlocked
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+  conditions:
+  - condition: time
+    after: '12:00:00'
+    before: 06:00:00
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: input_select.house_mode
+      state:
+      - Service
+  actions:
+  - action: lock.lock
+    metadata: {}
+    data:
+      code: '0725'
+    target:
+      entity_id: lock.front_door_lock
+  mode: single
+- id: '1773356433385'
+  alias: Lock front door at noon
+  description: ''
+  triggers:
+  - trigger: time
+    at: '12:00:00'
+  conditions:
+  - condition: device
+    device_id: 744fa3c99c7446193bf8a74797d2e9e9
+    domain: lock
+    entity_id: 9c8fba552b52818510436dd8de93e787
+    type: is_unlocked
+  actions:
+  - action: lock.lock
+    metadata: {}
+    data:
+      code: '0725'
+    target:
+      entity_id: lock.front_door_lock
+  mode: single
+- id: '1774617135833'
+  alias: Grid restored
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.powerwall_grid_status
+    from:
+    - off_grid
+    - off_grid_intentional
+    - off_grid_unintentional
+    to:
+    - on_grid
+  conditions: []
+  actions:
+  - action: notify.mobile_app_pixel_9
+    metadata: {}
+    data:
+      message: '{{ trigger.to_state.name }} changed from {{ trigger.from_state.state
+        }} to {{ trigger.to_state.state }}'
+  - type: turn_on
+    device_id: eaa0ab43f12463dcbe44cd87ff3ed000
+    entity_id: 23736c5765ab7281825cf88a61ba6e58
+    domain: light
+  mode: single
+- id: '1774797376461'
+  alias: 'Awning: close on rain or wind '
+  description: ''
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.openweathermap_wind_gust_speed
+    above: 8
+  - trigger: state
+    entity_id:
+    - sensor.tempest_precipitation_type
+    to:
+    - rain
+    - hail
+    - rain_hail
+  conditions: []
+  actions:
+  - action: cover.close_cover
+    metadata: {}
+    target:
+      entity_id: cover.patio_awning
+    data: {}
+  mode: single
+- id: '1775049962884'
+  alias: 'Family room shades open when sun lowers '
+  description: Raise family room shades when sun is longer coming in room
+  triggers:
+  - alias: Raise shades when sun is no longer coming into family room
+    trigger: template
+    value_template: "{{ state_attr('sun.sun', 'azimuth') | float < 115\n   or state_attr('sun.sun',
+      'azimuth') | float > 215\n   or state_attr('sun.sun', 'elevation') | float <
+      5 }}"
+  conditions:
+  - condition: sun
+    before: sunset
+    after: sunrise
+    enabled: false
+  actions:
+  - action: cover.open_cover
+    data: {}
+    target:
+      entity_id:
+      - cover.family_room_far_left_bottom
+      - cover.family_room_center_left_bottom
+      - cover.family_room_center_right_bottom
+      - cover.family_room_far_right_bottom
+  mode: single
+- id: '1775167793400'
+  alias: Family room shades lowered to block sun
+  description: Trigger shades closing based on sun position
+  triggers:
+  - alias: Trigger based on azimuth and elevation
+    trigger: template
+    value_template: "{{ state_attr('sun.sun', 'azimuth') | float >= 115\n   and state_attr('sun.sun',
+      'azimuth') | float <= 215\n   and state_attr('sun.sun', 'elevation') | float
+      >= 5 }}"
+  conditions:
+  - condition: sun
+    before: sunset
+    after: sunrise
+    enabled: false
+  - condition: numeric_state
+    entity_id: sensor.tempest_illuminance
+    above: 25000
+  actions:
+  - action: cover.set_cover_position
+    target:
+      entity_id:
+      - cover.family_room_far_left_bottom
+      - cover.family_room_center_left_bottom
+      - cover.family_room_center_right_bottom
+      - cover.family_room_far_right_bottom
+    data:
+      position: 30
+  mode: single
+- id: '1775332442098'
+  alias: 'Lights: Kitchen On'
+  description: ''
+  triggers:
+  - type: turned_on
+    device_id: b9e90683c8fd6c64bb2614f52d6292ea
+    entity_id: 46ac96635286be73e82ac82d9d2e5ff1
+    domain: light
+    trigger: device
+  - type: turned_on
+    device_id: bbd689d19faaa5a3afa355d54022aec9
+    entity_id: 18b9187aeda451561274eb1a92f2d3b0
+    domain: light
+    trigger: device
+  conditions: []
+  actions:
+  - action: light.turn_on
+    metadata: {}
+    target:
+      entity_id: light.kitchen_lights
+    data: {}
+  mode: restart
+- id: '1775344573664'
+  alias: 'Lights: Kitchen Off'
+  description: ''
+  triggers:
+  - type: turned_off
+    device_id: b9e90683c8fd6c64bb2614f52d6292ea
+    entity_id: 46ac96635286be73e82ac82d9d2e5ff1
+    domain: light
+    trigger: device
+  - type: turned_off
+    device_id: bbd689d19faaa5a3afa355d54022aec9
+    entity_id: 18b9187aeda451561274eb1a92f2d3b0
+    domain: light
+    trigger: device
+  conditions: []
+  actions:
+  - action: light.turn_off
+    metadata: {}
+    target:
+      entity_id: light.kitchen_lights
+    data: {}
+  mode: single
+- id: '1775345177487'
+  alias: 'Lights: Mud Room On Timer'
+  description: ''
+  triggers:
+  - type: turned_on
+    device_id: 1b1c46dc620d1b2bcd1773eac0e87005
+    entity_id: c03ac09c29f6d8a786169bfb8b530f30
+    domain: light
+    trigger: device
+  conditions: []
+  actions:
+  - action: light.turn_on
+    metadata: {}
+    target:
+      entity_id: light.mud_room_lights
+    data: {}
+  - delay:
+      hours: 0
+      minutes: 2
+      seconds: 0
+      milliseconds: 0
+  - action: light.turn_off
+    metadata: {}
+    target:
+      entity_id: light.mud_room_lights
+    data: {}
+  mode: single
+- id: '1775349137167'
+  alias: 'Brilliant: Goodnight Scene'
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - input_boolean.brilliant_goodnight
+    to:
+    - 'on'
+  conditions: []
+  actions:
+  - repeat:
+      count: 2
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        target:
+          entity_id:
+          - light.family_room_lights
+          - light.kitchen_lights
+          - light.mud_room_lights
+          - light.outdoor_lights
+          - light.basement_main_2
+          - light.dining_room
+        data: {}
+      - action: light.turn_on
+        metadata: {}
+        target:
+          entity_id: light.front_foyer_light
+        data: {}
+  - action: input_boolean.turn_off
+    metadata: {}
+    target:
+      entity_id:
+      - input_boolean.brilliant_goodnight
+      - input_boolean.brilliant_good_morning
+    data: {}
+  mode: single
+- id: '1775349465576'
+  alias: 'Brilliant: Good Morning Scene'
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - input_boolean.brilliant_good_morning
+    to:
+    - 'on'
+  conditions: []
+  actions:
+  - repeat:
+      count: 2
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        target:
+          entity_id:
+          - light.family_room_lights
+          - light.kitchen_lights
+        data: {}
+      - action: light.turn_off
+        metadata: {}
+        target:
+          entity_id: light.front_foyer_light
+        data: {}
+  - action: input_boolean.turn_off
+    metadata: {}
+    target:
+      entity_id:
+      - input_boolean.brilliant_good_morning
+      - input_boolean.brilliant_goodnight
+    data: {}
+  mode: single
+- id: '1775399114804'
+  alias: 'Lights: Family Room Off'
+  description: ''
+  triggers:
+  - type: turned_off
+    device_id: cb68e78adf7255079bdfd666f64edfa6
+    entity_id: 3ea4ac32b404965b27d5fbaf79528737
+    domain: light
+    trigger: device
+  conditions: []
+  actions:
+  - action: light.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - light.family_room_lights
+      - light.mud_room_lights
+  mode: single
+- id: '1775399229066'
+  alias: 'Lights: Family Room On'
+  description: ''
+  triggers:
+  - type: turned_on
+    device_id: cb68e78adf7255079bdfd666f64edfa6
+    entity_id: 3ea4ac32b404965b27d5fbaf79528737
+    domain: light
+    trigger: device
+  conditions: []
+  actions:
+  - action: light.turn_on
+    metadata: {}
+    target:
+      entity_id:
+      - light.family_room_lights
+    data: {}
+  mode: restart
+- id: '1775857691024'
+  alias: Basement lights on
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - light.basement_stairs
+    to:
+    - 'on'
+  - trigger: state
+    entity_id:
+    - light.basement_main_2
+    to:
+    - 'on'
+  conditions: []
+  actions:
+  - action: light.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: light.basement_lights
+  - action: switch.turn_on
+    metadata: {}
+    target:
+      device_id: 25c5c132b1d268fca5a97a31d1bee781
+    data: {}
+  mode: restart
+- id: '1775858266653'
+  alias: Basement lights and TV off
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - light.basement_stairs
+    to:
+    - 'off'
+  - trigger: state
+    entity_id:
+    - light.basement_main_2
+    to:
+    - 'off'
+  conditions: []
+  actions:
+  - action: light.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - light.basement_lights
+      - light.basement_guest_bedroom
+      - light.basement_spare_room
+  - action: media_player.play_media
+    target:
+      entity_id: media_player.basement_gym_alexa_tv
+    data:
+      media:
+        media_content_id: turn off the TV
+        media_content_type: custom
+        metadata: {}
+  - action: switch.turn_off
+    metadata: {}
+    target:
+      device_id: 25c5c132b1d268fca5a97a31d1bee781
+      entity_id:
+      - switch.basement_gym_david_s_bike_2
+      - switch.basement_gym_lisa_s_bike_2
+    data: {}
+  mode: single
+- id: '1775860665794'
+  alias: 'Cycling Studio: Lisa''s Bike'
+  description: ''
+  triggers:
+  - device_id: 69b27dd142374f95f616d91debdbc680
+    domain: zwave_js
+    type: event.value_notification.central_scene
+    property: scene
+    property_key: '003'
+    endpoint: 0
+    command_class: 91
+    subtype: Endpoint 0 Scene 003
+    trigger: device
+  conditions: []
+  actions:
+  - if:
+    - condition: device
+      type: is_off
+      device_id: 7f6e2cb485253fb2f9dd2b51c5b00fe4
+      entity_id: 2afb827ddb70f0379bf9cc05c0282537
+      domain: switch
+    then:
+    - action: switch.turn_on
+      metadata: {}
+      target:
+        entity_id: switch.basement_gym_lisa_s_bike_2
+      data: {}
+    else:
+    - action: switch.turn_off
+      metadata: {}
+      target:
+        entity_id: switch.basement_gym_lisa_s_bike_2
+      data: {}
+  mode: single
+- id: '1775930518112'
+  alias: Reload Shelly devices on startup
+  description: ''
+  triggers:
+  - trigger: homeassistant
+    event: start
+  conditions: []
+  actions:
+  - delay:
+      hours: 0
+      minutes: 2
+      seconds: 0
+      milliseconds: 0
+  - action: homeassistant.reload_config_entry
+    metadata: {}
+    target:
+      device_id:
+      - 1ed8cf35443d1022bd437599e72528e3
+      - dced6c196cbc8af09b2bb1841066bd70
+      - 0a21fe75432cc6f9d3550496176b1cce
+      - d960d559af8ea844b8a8fb68c1825628
+      - 6273fe957ee62fc6c6741a19df40d420
+    data: {}
+  mode: single
+- id: '1776002228774'
+  alias: Upstairs office desk with light
+  description: ''
+  triggers:
+  - type: changed_states
+    device_id: 6f2741035b76438f324752e2d6e10c0e
+    entity_id: d9ecc69dd139a2c569921e8fe11d092d
+    domain: light
+    trigger: device
+  conditions: []
+  actions:
+  - if:
+    - condition: state
+      entity_id: light.upstairs_office_fan_light
+      state:
+      - 'on'
+    then:
+    - type: turn_on
+      device_id: 02e70ff7ede52863f6baece598464501
+      entity_id: 44c9abb790a06bcf17032ee0002720c9
+      domain: switch
+    else:
+    - type: turn_off
+      device_id: 02e70ff7ede52863f6baece598464501
+      entity_id: 44c9abb790a06bcf17032ee0002720c9
+      domain: switch
+  mode: single
+- id: '1776027663398'
+  alias: Master bath fan on with shower
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - switch.master_bath_tub_shower_1
+    to:
+    - 'on'
+  conditions: []
+  actions:
+  - action: switch.turn_on
+    metadata: {}
+    target:
+      entity_id: switch.master_bath_fan
+    data: {}
+  mode: single
+- id: '1776027822773'
+  alias: 'Master Bath: Turn All Off with Main'
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - switch.master_bath_vanity_1
+    to:
+    - 'off'
+  conditions: []
+  actions:
+  - action: media_player.media_pause
+    metadata: {}
+    target:
+      entity_id: media_player.master_bath_sonos
+    data: {}
+  - action: light.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: light.master_bath_lights
+  - action: switch.turn_off
+    metadata: {}
+    target:
+      entity_id: switch.master_bath_vanity_1
+    data: {}
+  mode: single
+- id: '1776112854833'
+  alias: Outdoor front lights on 30 minutes before sunset
+  description: ''
+  triggers:
+  - trigger: sun
+    event: sunset
+    offset: -00:30:00
+  conditions: []
+  actions:
+  - action: light.turn_on
+    metadata: {}
+    target:
+      entity_id: light.outdoor_front_lights
+    data: {}
+  mode: single
+- id: '1776115537157'
+  alias: Master bath fan off 2 minutes after shower
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - switch.master_bath_tub_shower_1
+    to:
+    - 'off'
+    for:
+      hours: 0
+      minutes: 2
+      seconds: 0
+  conditions: []
+  actions:
+  - action: switch.turn_off
+    metadata: {}
+    target:
+      entity_id: switch.master_bath_fan
+    data: {}
+  mode: single
+- id: '1776132794106'
+  alias: 'Master Bath: Auto Off Timer with Motion'
+  description: 'Turns off bathroom lights 10 minutes after they turn on, or 10 minutes
+    after motion stops if motion is detected.
+
+    '
+  triggers:
+  - entity_id:
+    - light.master_bath_vanity
+    - light.master_bath_tub_shower
+    - switch.master_bath_tub_shower_1
+    - switch.master_bath_closet
+    - switch.master_bath_toilet
+    to:
+    - 'on'
+    id: lights_on
+    trigger: state
+  - entity_id:
+    - binary_sensor.master_bath_shade_switch_motion
+    - binary_sensor.master_bath_toilet_motion_detection
+    - binary_sensor.master_bath_closet_motion_detection
+    to:
+    - 'on'
+    id: motion_detected
+    trigger: state
+  - entity_id:
+    - binary_sensor.master_bath_shade_switch_motion
+    - binary_sensor.master_bath_toilet_motion_detection
+    - binary_sensor.master_bath_closet_motion_detection
+    to:
+    - 'off'
+    id: motion_cleared
+    trigger: state
+  - event_type: timer.finished
+    event_data:
+      entity_id: timer.master_bath_motion_timer
+    id: timer_done
+    trigger: event
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: lights_on
+      sequence:
+      - action: switch.turn_on
+        metadata: {}
+        target:
+          entity_id: switch.master_bath_vanity_1
+        data: {}
+      - target:
+          entity_id: timer.master_bath_motion_timer
+        data:
+          duration: 00:10:00
+        action: timer.start
+    - conditions:
+      - condition: trigger
+        id: motion_detected
+      sequence:
+      - target:
+          entity_id: timer.master_bath_motion_timer
+        action: timer.cancel
+    - conditions:
+      - condition: trigger
+        id: motion_cleared
+      sequence:
+      - target:
+          entity_id: timer.master_bath_motion_timer
+        data:
+          duration:
+            hours: 0
+            minutes: 30
+            seconds: 0
+        action: timer.start
+    - conditions:
+      - condition: trigger
+        id: timer_done
+      sequence:
+      - target:
+          entity_id:
+          - light.master_bath_vanity
+          - light.master_bath_tub_shower
+        action: light.turn_off
+        data: {}
+      - action: switch.turn_off
+        metadata: {}
+        target:
+          entity_id:
+          - switch.master_bath_tub_shower_1
+          - switch.master_bath_closet
+          - switch.master_bath_toilet
+        data: {}
+  mode: restart
+- id: '1776260618366'
+  alias: Family room fan off when room switch turns on
+  description: Turns off the Haiku fan the first time the power switch is flipped
+    each day.
+  triggers:
+  - entity_id:
+    - switch.family_room_fan_light
+    to:
+    - 'on'
+    trigger: state
+  conditions: []
+  actions:
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - target:
+      entity_id: fan.family_room_fan
+    action: fan.turn_off
+    data: {}
+  mode: single
+- id: '1776265030769'
+  alias: 'Cycling Studio: David''s Bike'
+  description: ''
+  triggers:
+  - device_id: 69b27dd142374f95f616d91debdbc680
+    domain: zwave_js
+    type: event.value_notification.central_scene
+    property: scene
+    property_key: '003'
+    endpoint: 0
+    command_class: 91
+    subtype: Endpoint 0 Scene 003
+    trigger: device
+    value: 2
+  conditions: []
+  actions:
+  - if:
+    - condition: state
+      entity_id: switch.basement_gym_david_s_bike_2
+      state:
+      - 'on'
+    then:
+    - action: switch.turn_off
+      metadata: {}
+      target:
+        entity_id: switch.basement_gym_david_s_bike_2
+      data: {}
+    - action: media_player.media_pause
+      metadata: {}
+      data: {}
+      target:
+        entity_id: media_player.basement_gym_sonos
+    - action: media_player.turn_off
+      metadata: {}
+      target:
+        entity_id: media_player.basement_gym_fire_tv
+      data: {}
+    else:
+    - action: switch.turn_on
+      metadata: {}
+      target:
+        entity_id: switch.basement_gym_david_s_bike_2
+      data: {}
+  mode: single
+- id: '1776446816878'
+  alias: 'Mode: Set Home to Awake'
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - switch.master_bath_vanity
+    to:
+    - 'on'
+  - trigger: time
+    at: 08:00:00
+  conditions:
+  - condition: time
+    after: 06:00:00
+    before: '21:00:00'
+  actions:
+  - action: input_select.select_option
+    metadata: {}
+    target:
+      entity_id: input_select.house_mode
+    data:
+      option: Awake
+  mode: single
+- id: '1776447187411'
+  alias: 'Mode: Set Home to Asleep'
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - input_boolean.brilliant_goodnight
+    to:
+    - 'on'
+  - trigger: time
+    at: '21:00:00'
+  conditions: []
+  actions:
+  - action: input_select.select_option
+    metadata: {}
+    target:
+      entity_id: input_select.house_mode
+    data:
+      option: Asleep
+  mode: single
+- id: '1776447560953'
+  alias: Master bath closet on with motion when awake
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.master_bath_closet_motion_detection
+    to:
+    - 'on'
+  conditions:
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: input_select.house_mode
+      state:
+      - Awake
+    - condition: state
+      entity_id: light.master_bath_vanity
+      state:
+      - 'on'
+  actions:
+  - action: light.turn_on
+    metadata: {}
+    target:
+      entity_id: light.master_bath_closet
+    data: {}
+  mode: single
+- id: '1776458308872'
+  alias: Front office light on with motion
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.front_office_motion_present
+    to:
+    - 'on'
+  conditions: []
+  actions:
+  - action: light.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: light.front_office_light_and_motion
+  mode: single
+- id: '1776462394467'
+  alias: Front office lights off after inactivity
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.front_office_motion_vacant
+    to:
+    - 'off'
+    for:
+      hours: 0
+      minutes: 30
+      seconds: 0
+  conditions: []
+  actions:
+  - action: input_boolean.turn_on
+    metadata: {}
+    target:
+      entity_id: input_boolean.front_office_inactivity_flag
+    data: {}
+  - action: light.turn_off
+    metadata: {}
+    target:
+      entity_id: light.front_office_light_and_motion
+    data: {}
+  mode: single
+- id: '1776472363261'
+  alias: Family room TV on with switch double press
+  description: ''
+  triggers:
+  - device_id: cb68e78adf7255079bdfd666f64edfa6
+    domain: zwave_js
+    type: event.value_notification.central_scene
+    property: scene
+    property_key: '001'
+    endpoint: 0
+    command_class: 91
+    subtype: Endpoint 0 Scene 001
+    trigger: device
+    value: 3
+  conditions: []
+  actions:
+  - action: media_player.play_media
+    target:
+      entity_id: media_player.family_room_alexa_tv
+    data:
+      media:
+        media_content_id: tune to {{ channel_name }} on YouTube TV
+        media_content_type: custom
+        metadata: {}
+  - variables:
+      target_tv: "{% set mapper = {\n  'Family Room': 'media_player.family_room_alexa_tv',\n
+        \ 'Basement Gym': 'media_player.basement_gym_alexa_tv',\n  'Master Bedroom':
+        'media_player.master_bedroom_tv'\n} %}  {{ mapper.get(states('input_select.fire_tv_room'))
+        }}\n"
+      channel_name: "{% set mapper = {\n  'MSNOW': 'MSNBC',\n  'CNN': 'C N N'\n} %}
+        \ {% set selected = states('input_select.youtube_tv_channel') %} {{ mapper.get(selected,
+        selected) }}\n"
+    enabled: false
+  - action: script.tv_channel_tuner
+    metadata: {}
+    data:
+      target_room: Family Room
+  mode: single
+- id: '1776561136145'
+  alias: Attic fan turn on
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - climate.master_bedroom
+    attribute: hvac_action
+    to:
+    - cooling
+  - trigger: state
+    entity_id:
+    - binary_sensor.master_bedroom_airflow
+    to:
+    - 'on'
+  conditions:
+  - condition: time
+    after: '20:00:00'
+    before: 05:00:00
+  - condition: state
+    entity_id: binary_sensor.master_bedroom_airflow
+    state:
+    - 'on'
+  - condition: numeric_state
+    entity_id: sensor.tempest_feels_like
+    below: sensor.master_bedroom_temperature_offset
+  actions:
+  - action: switch.turn_on
+    metadata: {}
+    target:
+      entity_id: switch.attic_fan_2
+    data: {}
+  mode: single
+- id: '1776563536817'
+  alias: Attic fan turn off
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - climate.master_bedroom
+    attribute: hvac_action
+    to:
+    - idle
+    - 'off'
+  - trigger: time
+    at: 05:00:00
+  - trigger: state
+    entity_id:
+    - binary_sensor.master_bedroom_airflow
+    to:
+    - 'off'
+  - trigger: numeric_state
+    entity_id:
+    - sensor.tempest_feels_like
+    below: sensor.master_bedroom_temperature_offset
+  conditions: []
+  actions:
+  - action: switch.turn_off
+    metadata: {}
+    target:
+      entity_id: switch.attic_fan_2
+    data: {}
+  mode: single
+- id: '1776686542775'
+  alias: 'Master bath toilet on with motion when awake '
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.master_bath_toilet_motion_detection
+    to:
+    - 'on'
+  conditions:
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: input_select.house_mode
+      state:
+      - Awake
+    - condition: state
+      entity_id: light.master_bath_vanity
+      state:
+      - 'on'
+  actions:
+  - action: light.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: light.master_bath_toilet
+  mode: single
+- id: '1776712631512'
+  alias: Family room TV off switch 2x press
+  description: ''
+  triggers:
+  - device_id: cb68e78adf7255079bdfd666f64edfa6
+    domain: zwave_js
+    type: event.value_notification.central_scene
+    property: scene
+    property_key: '002'
+    endpoint: 0
+    command_class: 91
+    subtype: Endpoint 0 Scene 002
+    trigger: device
+    value: 3
+  conditions: []
+  actions:
+  - action: media_player.play_media
+    target:
+      entity_id: media_player.family_room_alexa_tv
+    data:
+      media:
+        media_content_id: turn off the TV
+        media_content_type: custom
+        metadata: {}
+  mode: single
+- id: '1776714148029'
+  alias: Garden Shed Door Lock Timer
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - lock.garden_shed_door_lock
+    to:
+    - open
+    for:
+      hours: 0
+      minutes: 20
+      seconds: 0
+  conditions: []
+  actions:
+  - action: lock.lock
+    metadata: {}
+    target:
+      entity_id: lock.garden_shed_door_lock
+    data: {}
+  mode: single
+- id: '1776714218784'
+  alias: Back Porch Door Lock Timer
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - lock.back_porch_door_lock
+    to:
+    - open
+    for:
+      hours: 0
+      minutes: 20
+      seconds: 0
+  conditions: []
+  actions:
+  - action: lock.lock
+    metadata: {}
+    data: {}
+    target:
+      entity_id: lock.back_porch_door_lock
+  mode: single
+- id: '1776882766190'
+  alias: Nightly helper devices reset
+  description: ''
+  triggers:
+  - trigger: time
+    at: 02:00:00
+  conditions: []
+  actions:
+  - action: input_boolean.turn_off
+    metadata: {}
+    target:
+      entity_id:
+      - input_boolean.brilliant_good_morning
+      - input_boolean.brilliant_goodnight
+      - input_boolean.developer_mode
+      - input_boolean.fire_tv_power_target
+    data: {}
+  - action: media_player.volume_set
+    metadata: {}
+    target:
+      entity_id: media_player.master_bath_sonos
+    data:
+      volume_level: 0.1
+  - action: media_player.volume_set
+    metadata: {}
+    target:
+      entity_id: media_player.family_room_sonos
+    data:
+      volume_level: 0.2
+  mode: single
+- id: '1776891241884'
+  alias: Front office desk outlet on with light
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - light.front_office_light_and_motion
+    to:
+    - 'on'
+  conditions:
+  - condition: time
+    after: 06:00:00
+    before: '18:00:00'
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+    enabled: false
+  actions:
+  - action: input_boolean.turn_off
+    metadata: {}
+    target:
+      entity_id: input_boolean.front_office_inactivity_flag
+    data: {}
+  - action: switch.turn_on
+    metadata: {}
+    target:
+      entity_id: switch.front_office_desk_outlet_2
+    data: {}
+  mode: single
+- id: '1776963076558'
+  alias: Ring doorbell chimes
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.front_door_ding
+    to:
+    - 'on'
+  conditions: []
+  actions:
+  - action: switch.turn_on
+    metadata: {}
+    target:
+      entity_id: switch.doorbell_chimes_front
+    data: {}
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - action: switch.turn_off
+    metadata: {}
+    target:
+      entity_id: switch.doorbell_chimes_front
+    data: {}
+  mode: single
+- id: '1776982710701'
+  alias: Set pre-peak backup power reserve based on forecast
+  description: ''
+  triggers:
+  - trigger: time_pattern
+    hours: /1
+  conditions:
+  - condition: time
+    before: '16:55:00'
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+  - condition: numeric_state
+    entity_id: sun.sun
+    attribute: elevation
+    above: 10
+  actions:
+  - action: number.set_value
+    metadata: {}
+    target:
+      entity_id: number.powerwall_backup_reserve
+    data:
+      value: '{{ states(''sensor.powerwall_optimal_reserve'') | int }}'
+  mode: single
+- id: '1776983005711'
+  alias: Release stored battery reserve at start of peak TOU
+  description: ''
+  triggers:
+  - trigger: time
+    at: '16:56:00'
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+  conditions: []
+  actions:
+  - action: number.set_value
+    metadata: {}
+    target:
+      entity_id: number.powerwall_backup_reserve
+    data:
+      value: '20'
+  mode: single
+- id: '1776986271415'
+  alias: Front office desk outlet off with light
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - light.front_office_light_and_motion
+    to:
+    - 'off'
+  conditions:
+  - condition: or
+    conditions:
+    - condition: not
+      conditions:
+      - condition: time
+        after: 06:00:00
+        before: '18:00:00'
+        weekday:
+        - mon
+        - tue
+        - wed
+        - thu
+        - fri
+    - condition: state
+      entity_id: input_boolean.front_office_inactivity_flag
+      state:
+      - 'off'
+  actions:
+  - action: switch.turn_off
+    metadata: {}
+    target:
+      entity_id: switch.front_office_desk_outlet_2
+    data: {}
+  mode: single
+- id: '1777076389574'
+  alias: 'Front office outlet off at end of workday '
+  description: ''
+  triggers:
+  - trigger: time
+    at: '18:00:00'
+  conditions:
+  - condition: state
+    entity_id: light.front_office_light_and_motion
+    state:
+    - 'off'
+  actions:
+  - action: switch.turn_off
+    metadata: {}
+    target:
+      entity_id: switch.front_office_desk_outlet_2
+    data: {}
+  mode: single
+- id: '1777088256752'
+  alias: Outdoor lights off at 9p
+  description: ''
+  triggers:
+  - trigger: time
+    at: '21:00:00'
+  conditions: []
+  actions:
+  - action: light.turn_off
+    metadata: {}
+    target:
+      entity_id: light.outdoor_lights
+    data: {}
+  mode: single
+- id: '1777244652191'
+  alias: Train switch on
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - switch.front_office_train_switch
+    to:
+    - 'on'
+  conditions: []
+  actions:
+  - action: switch.turn_on
+    metadata: {}
+    target:
+      entity_id: switch.front_office_train_outlet
+    data: {}
+  mode: single
+- id: '1777244773318'
+  alias: Train switch off
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - switch.front_office_train_switch
+    to:
+    - 'off'
+  conditions: []
+  actions:
+  - action: switch.turn_off
+    metadata: {}
+    target:
+      entity_id: switch.front_office_train_outlet
+    data: {}
+  mode: single
+- id: '1778292673306'
+  alias: Frigate Bird Watcher
+  description: ''
+  use_blueprint:
+    path: SgtBatten/Stable.yaml
+    input:
+      camera:
+      - camera.back_yard_frigate
+      notify_device: ff0c0499ba225027a5e52548d96bfd8b
+- id: '1778293482788'
+  alias: Frigate Bird Notifier
+  description: ''
+  triggers:
+  - topic: frigate/events
+    trigger: mqtt
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.payload_json[''after''][''label''] == ''bird'' }}
+
+      '
+  actions:
+  - condition: template
+    value_template: '{{ trigger.payload_json[''after''][''label''] == ''bird'' }}
+
+      '
+    enabled: false
+  - action: notify.mobile_app_pixel_9
+    data:
+      title: Bird Spotted!
+      message: A {{ trigger.payload_json['after']['sub_label'] | default('bird') }}
+        was detected.
+      data:
+        image: https://your-ha-url.com/api/frigate/notifications/{{ trigger.payload_json['after']['id']
+          }}/snapshot.jpg
+        tag: '{{ trigger.payload_json[''after''][''id''] }}'
+        clickAction: /birdseye
+  mode: single
+- id: '1778327731220'
+  alias: Bird Watch Detection
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.backyard_motion
+    - binary_sensor.back_yard_frigate_motion
+    to:
+    - 'on'
+  conditions: []
+  actions:
+  - action: switch.turn_on
+    metadata: {}
+    target:
+      entity_id:
+      - switch.back_yard_frigate_detect
+      - switch.back_yard_frigate_recordings
+    data: {}
+  - wait_for_trigger:
+    - trigger: state
+      entity_id:
+      - binary_sensor.back_yard_frigate_motion
+      to:
+      - 'off'
+    timeout:
+      hours: 0
+      minutes: 0
+      seconds: 30
+      milliseconds: 0
+  - action: switch.turn_off
+    metadata: {}
+    target:
+      entity_id:
+      - switch.back_yard_frigate_detect
+      - switch.back_yard_frigate_recordings
+    data: {}
+  mode: single
+- id: '1778627518219'
+  alias: Frigate Bird Logger
+  description: Logs bird detections to a CSV file
+  triggers:
+  - topic: frigate/events
+    trigger: mqtt
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.payload_json[''after''][''label''] == ''bird'' }}
+
+      '
+  actions:
+  - action: notify.send_message
+    metadata: {}
+    data:
+      message: '{{ trigger.payload_json[''after''][''sub_label''] | default(''unknown'')
+        }},{{ trigger.payload_json[''after''][''id''] }},{{ trigger.payload_json[''after''][''camera'']
+        }},"https://niwotha.katesconsult.com/api/frigate/notifications/{{ trigger.payload_json[''after''][''id'']
+        }}/snapshot.jpg","{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}"'
+    target:
+      entity_id: notify.bird_sightings_log
+  mode: queued
+  max: 10
+- id: '1778725632736'
+  alias: Frigate Bird Detection
+  description: Logs bird detections to a CSV file
+  triggers:
+  - trigger: numeric_state
+    entity_id: sensor.bird_feeder_bird_count
+    above: 0
+  conditions: []
+  actions:
+  - wait_for_trigger:
+    - trigger: template
+      value_template: '{{ state_attr(''binary_sensor.bird_feeder_bird_occupancy'',
+        ''sub_label'') != none }}'
+    timeout:
+      seconds: 10
+    continue_on_timeout: true
+  - action: notify.bird_sightings_log
+    data:
+      message: '{{ state_attr(''binary_sensor.bird_feeder_bird_occupancy'', ''sub_label'')
+        or ''Unknown Bird'' }}, {{ (state_attr(''binary_sensor.bird_feeder_bird_occupancy'',
+        ''score'') | float * 100) | round(1) }}%, https://niwotha.katesconsult.com/api/frigate/notifications/{{
+        state_attr(''binary_sensor.bird_feeder_bird_occupancy'', ''event_id'') }}/thumbnail.jpg,
+        {{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
+  mode: queued
+  max: 10

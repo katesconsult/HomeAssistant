@@ -10,15 +10,15 @@ UPDATE_INTERVAL = 3600  # seconds
 
 SENSOR_TYPES = {
     "temperature": {
-        "name": "Temperature",
+        "name": "Current Temperature",
         "unit": "°F"
     },
     "feels_like": {
-        "name": "Feels Like",
+        "name": "Current Feels Like",
         "unit": "°F"
     },
     "humidity": {
-        "name": "Humidity",
+        "name": "Current Humidity",
         "unit": "%"
     },
     "overnight_low": {
@@ -29,6 +29,9 @@ SENSOR_TYPES = {
         "name": "Overnight High",
         "unit": "°F"
     },
+    #"forecast": {
+    #    "name": "Forecast Data"
+    #},
     "last_update": {
         "name": "Last Update",
         "unit": "timestamp"

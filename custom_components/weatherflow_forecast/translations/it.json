@@ -1,0 +1,113 @@
+{
+    "config": {
+        "abort": {
+            "unique_id": "La stazione WeatherFlow è già stata configurata."
+        },
+        "error": {
+            "wrong_station_id": "L'ID della stazione non è corretto. Verifica che non stai utilizzando l'ID del dispositivo.",
+            "server_error": "WeatherFlow servers encountered an unexpected error",
+            "wrong_token": "Il Token API inserito non è corretto.",
+            "offline_error": "La stazione è offline oppure non ci sono osservazioni recenti. Verifica lo stato della stazione o rimuovi i sensori e riprova.",
+            "bad_request": "Errore sconosciuto in fase di accesso ai dati."
+        },
+        "step": {
+            "user": {
+                "description": "Configurazione della stazione WeatherFlow Forecast",
+                "title": "WeatherFlow Forecast",
+                "data": {
+                    "station_id": "ID stazione",
+                    "api_token": "Token API personale",
+                    "forecast_hours": "Hours to show in Hourly Forecast",
+                    "add_sensors": "Add sensors from the Weather Station"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "api_token": "Token API personale",
+                    "forecast_hours": "Hours to show in Hourly Forecast",
+                    "add_sensors": "Add sensors from the Weather Station"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "pressure_trend": {
+                "state": {
+                    "falling": "Discendente",
+                    "rising": "Ascendente",
+                    "steady": "Stabile"
+                }
+            },
+            "wind_cardinal": {
+                "state": {
+                    "n": "N",
+                    "nne": "NNE",
+                    "ne": "NE",
+                    "ene": "ENE",
+                    "e": "E",
+                    "ese": "ESE",
+                    "se": "SE",
+                    "sse": "SSE",
+                    "s": "S",
+                    "ssw": "SSO",
+                    "sw": "SO",
+                    "wsw": "OSO",
+                    "w": "O",
+                    "wnw": "ONO",
+                    "nw": "NO",
+                    "nnw": "NNO"
+                }
+            },
+            "precipitation_type": {
+                "state": {
+                    "no_rain": "Dry",
+                    "rain": "Rain",
+                    "heavy_rain": "Heavy rain/Hail"
+                }
+            },
+            "beaufort": {
+                "state": {
+                    "calm": "Calma",
+                    "light_air": "Bava di vento",
+                    "light_breeze": "Brezza leggera",
+                    "gentle_breeze": "Brezza leggera",
+                    "moderate_breeze": "Brezza moderata",
+                    "fresh_breeze": "Brezza moderata",
+                    "strong_breeze": "Brezza forte",
+                    "moderate_gale": "Burrasca moderata",
+                    "fresh_gale": "Burrasca moderata",
+                    "strong_gale": "Burrasca intensa",
+                    "storm": "Bufera",
+                    "violent_storm": "Bufera violenta",
+                    "hurricane": "Uragano"
+                }
+            },
+            "precip_intensity": {
+                "state": {
+                    "no_rain": "Nessuna",
+                    "very_light": "Molto leggera",
+                    "light": "Leggera",
+                    "moderate": "Moderata",
+                    "heavy": "Intensa",
+                    "very_heavy": "Molto intensa",
+                    "extreme": "Estrema"
+                }
+            },
+            "uv_description": {
+                "state": {
+                    "extreme": "Estremo",
+                    "very-high": "Molto Elevato",
+                    "high": "Elevato",
+                    "moderate": "Moderato",
+                    "low": "Basso",
+                    "none": "Nessuno"
+                }
+            }
+        }
+    }
+}

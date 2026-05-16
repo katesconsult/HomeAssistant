@@ -17,7 +17,17 @@
       "already_configured": "Device is already configured",
       "no_devices_found": "No Renogy BLE devices discovered",
       "not_supported_device": "This device is not a supported Renogy BLE device",
-      "unsupported_device_type": "The {device_type} device type is not currently supported. Only controller devices are fully supported at this time."
+      "unsupported_device_type": "The {device_type} device type is not currently supported. Only controller, battery, DCC (DC-DC charger), inverter, and shunt300 devices are fully supported at this time."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "shunt_connection_mode": "Smart Shunt connection mode",
+          "non_shunt_connection_mode": "Non-shunt connection mode"
+        }
+      }
     }
   }
 }

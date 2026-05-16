@@ -1,0 +1,98 @@
+- platform: universal
+  name: Hybrid Global Media Player
+  unique_id: hybrid_media_player_global
+  children:
+    - media_player.family_room_fire_tv
+    - media_player.basement_gym_fire_tv
+
+  state_template: >
+    {% set room = states('input_select.fire_tv_room') %}
+    {% set video_map = {
+      'Family Room': 'media_player.family_room_fire_tv',
+      'Basement Gym': 'media_player.basement_gym_fire_tv'
+    } %}
+    {% set active_video = video_map.get(room) %}
+    {% if is_state(active_video, 'standby') or is_state(active_video, 'unavailable') %}
+      off
+    {% else %}
+      {{ states(active_video) }}
+    {% endif %}
+
+  commands:
+    volume_up:
+      service: media_player.volume_up
+      target:
+        entity_id: media_player.family_room_sonos
+
+    volume_down:
+      service: media_player.volume_down
+      target:
+        entity_id: media_player.family_room_sonos
+
+    volume_set:
+      service: media_player.volume_set
+      data:
+        volume_level: "{{ volume_level }}"
+        entity_id: media_player.family_room_sonos
+
+    volume_mute:
+      service: media_player.volume_mute
+      data:
+        is_volume_muted: "{{ is_volume_muted }}"
+        entity_id: media_player.family_room_sonos
+
+  # These tell the Universal player which entity to "mimic" for the UI sliders
+  attributes:
+    is_volume_muted: media_player.family_room_sonos|is_volume_muted
+    volume_level: media_player.family_room_sonos|volume_level
+    
+    
+    
+    
+- platform: universal
+  name: Hybrid Global Media Player
+  unique_id: hybrid_media_player_global
+  children:
+    - media_player.family_room_fire_tv
+    - media_player.basement_gym_fire_tv
+
+  # Use the select to determine the state
+  state_template: >
+    {% set room = states('input_select.fire_tv_room') %}
+    {% set mapper = {'Family Room': 'media_player.family_room_fire_tv', 'Basement Gym': 'media_player.basement_gym_fire_tv'} %}
+    {{ states(mapper.get(room, 'media_player.family_room_fire_tv')) }}
+
+  # Map the volume controls to the correct device dynamically
+  commands:
+    volume_up:
+      service: media_player.volume_up
+      target:
+        entity_id: >
+          {{ 'media_player.family_room_sonos' if is_state('input_select.fire_tv_room', 'Family Room') else 'media_player.basement_gym_fire_tv' }}
+
+    volume_down:
+      service: media_player.volume_down
+      target:
+        entity_id: >
+          {{ 'media_player.family_room_sonos' if is_state('input_select.fire_tv_room', 'Family Room') else 'media_player.basement_gym_fire_tv' }}
+
+    volume_set:
+      service: media_player.volume_set
+      data:
+        volume_level: "{{ volume_level }}"
+        entity_id: >
+          {{ 'media_player.family_room_sonos' if is_state('input_select.fire_tv_room', 'Family Room') else 'media_player.basement_gym_fire_tv' }}
+
+    volume_mute:
+      service: media_player.volume_mute
+      data:
+        is_volume_muted: "{{ is_volume_muted }}"
+        entity_id: >
+          {{ 'media_player.family_room_sonos' if is_state('input_select.fire_tv_room', 'Family Room') else 'media_player.basement_gym_fire_tv' }}
+
+  # This is the "secret sauce" for the UI feedback
+  attributes:
+    is_volume_muted: >
+      {{ 'media_player.family_room_sonos|is_volume_muted' if is_state('input_select.fire_tv_room', 'Family Room') else 'media_player.basement_gym_fire_tv|is_volume_muted' }}
+    volume_level: >
+      {{ 'media_player.family_room_sonos|volume_level' if is_state('input_select.fire_tv_room', 'Family Room') else 'media_player.basement_gym_fire_tv|volume_level' }}

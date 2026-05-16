@@ -1,0 +1,6 @@
+# template definitions for converting input_boolean helpers to contact sensor to trigger Alexa routines
+- name: Alexa Family Room TV to CBS
+  unique_id: alexa_family_room_tv_cbs
+  device_class: door
+  state: >
+    {{ is_state('input_boolean.fire_tv_family_room_cbs', 'on') }}

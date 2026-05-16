@@ -1,0 +1,67 @@
+# rest_command:
+emhass_mpc_optim:
+  url: "http://192.168.4.151:5000/action/naive-mpc-optim"
+  method: POST
+  content_type: "application/json"
+  timeout: 120
+  payload: >
+    {
+      "soc_init": {{ (states('sensor.powerwall_percentage_charged') | float(0)) / 100 }},
+      "soc_final": 0.40,
+      "prediction_horizon": 48
+    }
+
+emhass_publish:
+  url: "http://192.168.4.151:5000/action/publish-data"
+  method: POST
+  content_type: "application/json"
+  timeout: 15
+  payload: "{}"
+  
+emhass_optim:
+  url: "http://192.168.4.151:5000/action/naive-mpc-optim"
+  method: POST
+  content_type: "application/json"
+  # Using variables like {{ soc_init }} allows you to pass data dynamically
+  payload: >
+    {
+      "soc_init": {{ soc_init | default(0.5) }},
+      "soc_final": {{ soc_final | default(0.5) }},
+      "prediction_horizon": {{ prediction_horizon | default(48) }},
+      "pv_power_forecast": {{ pv_forecast | default([]) }},
+      "load_cost_forecast": {{ cost_forecast | default([]) }}
+    }
+    
+# Call Meteostat API to retrieve hourly and daily data
+meteostat_daily:
+  url: "https://meteostat.p.rapidapi.com/point/daily?\
+    lat={{ latitude | urlencode }}&\
+    lon={{ longitude | urlencode }}&\
+    start={{ start_date | urlencode }}&\
+    end={{ end_date | urlencode }}&\
+    tz={{ time_zone }}&\
+    units=imperial"
+  method: GET
+  headers:
+    x-rapidapi-host: "meteostat.p.rapidapi.com"
+    x-rapidapi-key: "40f39438b4mshd3bd9a62c653f79p1fa94bjsn886e1e055ea1"
+    #x-rapidapi-key: "0801843631mshba562f061ef5715p12746fjsnbf9363139931"
+
+meteostat_hourly:
+  url: "https://meteostat.p.rapidapi.com/stations/hourly?\
+    station={{ station_code | urlencode }}\
+    &start={{ start_date | urlencode }}\
+    &end={{ end_date | urlencode }}\
+    &tz={{ time_zone }}\
+    &units=imperial"
+  method: GET
+  headers:
+    x-rapidapi-host: "meteostat.p.rapidapi.com"
+    x-rapidapi-key: "40f39438b4mshd3bd9a62c653f79p1fa94bjsn886e1e055ea1"
+
+# url: 'https://meteostat.p.rapidapi.com/point/hourly?\
+#   lat=52.5244&\
+#   lon=13.4105&\
+#   alt=43&\
+#   start=2020-01-01&\
+#   end=2020-12-31' \

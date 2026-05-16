@@ -1,0 +1,85 @@
+#--------------------------------------------
+# COVER TEMPLATES
+#--------------------------------------------
+
+# Family room shades
+- name: Family Room Shades
+  unique_id: mock_shade_family_room
+  set_cover_position:
+  - data:
+      value: '{{ position }}'
+    target:
+      entity_id:
+      - input_number.family_room_shade_position
+    action: input_number.set_value
+  open_cover:
+  - data:
+      value: 100
+    target:
+      entity_id:
+      - input_number.family_room_shade_position
+    #action: input_number.set_value
+    service: script.family_room_shades_open
+  close_cover:
+  - data:
+      value: 0
+    target:
+      entity_id:
+      - input_number.family_room_shade_position
+    #action: input_number.set_value
+    service: script.family_room_shades_close
+  stop_cover:
+  - data:
+      value: '{{ states(''input_number.family_room_shade_position'') }}'
+    #target:
+    #  entity_id:
+    #  - input_number.family_room_shade_position
+    #action: input_number.set_value
+    service: script.turn_off
+    target:
+      entity_id: script.family_room_shades_close  
+  position: '{{ states(''input_number.family_room_shade_position'') | int }}'
+
+# Kitchen shades
+- name: Kitchen Shades
+  unique_id: mock_shade_kitchen
+  set_cover_position:
+  - data:
+      value: '{{ position }}'
+    target:
+      entity_id:
+      - input_number.kitchen_shade_position
+    action: input_number.set_value
+  open_cover:
+  - data:
+      value: 100
+    target:
+      entity_id:
+      - input_number.kitchen_shade_position
+    #action: input_number.set_value
+    service: script.kitchen_shades_open
+  close_cover:
+  - data:
+      value: 0
+    target:
+      entity_id:
+      - input_number.kitchen_shade_position
+    #action: input_number.set_value
+    service: script.kitchen_shades_close
+  stop_cover:
+  - data:
+      value: '{{ states(''input_number.kitchen_shade_position'') }}'
+    target:
+      entity_id:
+      - input_number.kitchen_shade_position
+    action: input_number.set_value
+  position: '{{ states(''input_number.kitchen_shade_position'') | int }}'
+
+#- name: Living Room Shade
+#  unique_id: mock_shade_living_room
+
+#- name: Mock Family Room Shades
+#  unique_id: mock_cover
+
+#- name: Mock Kitchen Shades
+#  unique_id: kitchen_cover

@@ -68,7 +68,6 @@ from .const import (
 
 TIME_MINUTES = UnitOfTime.MINUTES
 _LOGGER: logging.Logger = logging.getLogger(__package__)
-logging.getLogger(DOMAIN).setLevel(logging.INFO)
 
 
 class Metric:
@@ -376,6 +375,9 @@ class ChargePoint(cp):
                 except Exception as ex:
                     _LOGGER.debug("trigger_status_notification ignored: %s", ex)
 
+            # Ensure HA states are correct immediately after connection
+            self.hass.async_create_task(self.update(self.settings.cpid))
+
         except Exception as e:
             _LOGGER.debug("post_connect aborted non-fatally: %s", e)
 
@@ -448,7 +450,7 @@ class ChargePoint(cp):
         """Request vendor specific data transfer from charger."""
         pass
 
-    async def get_configuration(self, key: str = "") -> str | None:
+    async def get_configuration(self, key: str = "") -> str | dict | None:
         """Get Configuration of charger for supported keys else return None."""
         return None
 
@@ -741,6 +743,13 @@ class ChargePoint(cp):
             metric_value: float | None = None
             mname = str(metric)
 
+            # --- THE NEUTRAL SHIELD ---
+            # If the charger sends the "N" phase on its own, skip it to prevent overwriting the real voltage.
+            active_phases = set(phase_info.keys()) - {"unit"}
+            if active_phases == {"N"}:
+                continue
+            # --------------------------
+
             if metric in [Measurand.voltage.value]:
                 if not phase_info.keys().isdisjoint(line_to_neutral_phases):
                     # Line to neutral voltages are averaged
@@ -871,6 +880,13 @@ class ChargePoint(cp):
 
             unprocessed: list[MeasurandValue] = []
 
+            # Pre-scan: Count how many distinct phases are reported for the main energy register
+            eair_phases = set()
+            for v in bucket:
+                v_measurand = getattr(v, "measurand", None) or DEFAULT_MEASURAND
+                if v_measurand == DEFAULT_MEASURAND and getattr(v, "phase", None):
+                    eair_phases.add(v.phase)
+
             for idx, sampled_value in enumerate(bucket):
                 measurand = sampled_value.measurand
                 value = sampled_value.value
@@ -878,6 +894,16 @@ class ChargePoint(cp):
                 phase = sampled_value.phase
                 location = sampled_value.location
                 context = sampled_value.context or ReadingContext.sample_periodic.value
+
+                # Strip the phase tag ONLY if a single-phase charger sends an isolated L1 energy reading.
+                # If multiple phases exist (e.g., L1, L2), leave them intact so process_phases() can sum them.
+                normalized_measurand = measurand or DEFAULT_MEASURAND
+                if (
+                    normalized_measurand == DEFAULT_MEASURAND
+                    and phase == Phase.l1.value
+                    and len(eair_phases) == 1
+                ):
+                    phase = None
 
                 # Backwards compatibility
                 if sampled_value.measurand is None:
@@ -1001,6 +1027,19 @@ class ChargePoint(cp):
     @property
     def supported_features(self) -> int:
         """Flag of Ocpp features that are supported."""
+        # Tests (and some external callers) may set supported features as a
+        # `set` of `Profiles` members. Normalize to an IntFlag value so
+        # callers can consistently perform bitwise operations or membership
+        # checks.
+        if isinstance(self._attr_supported_features, set):
+            flags = prof.NONE
+            for p in self._attr_supported_features:
+                try:
+                    flags |= p
+                except Exception:
+                    # ignore non-Profiles items
+                    continue
+            return flags
         return self._attr_supported_features
 
     def get_ha_metric(self, measurand: str, connector_id: int | None = None):

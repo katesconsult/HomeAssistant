@@ -1,0 +1,24 @@
+# sensor templates
+
+# Calculate sun incident on south facing family room windows  
+- name: "Sun Incidence Family Room"
+  unique_id: sun_incidence_family_room
+  unit_of_measurement: "°"
+  state: >
+    {% set sun_az = state_attr('sun.sun', 'azimuth') | float %}
+    {% set sun_el = state_attr('sun.sun', 'elevation') | float %}
+    {% set wall_az = 180.0 %}
+
+    {% set sun_el_rad = sun_el * pi / 180 %}
+    {% set az_diff_rad = (sun_az - wall_az) * pi / 180 %}
+
+    {% set cos_theta =
+      cos(sun_el_rad) *
+      cos(az_diff_rad)
+    %}
+
+    {% if cos_theta > 0 %}
+      {{ (acos(cos_theta) * 180 / pi) | round(1) }}
+    {% else %}
+      180
+    {% endif %}

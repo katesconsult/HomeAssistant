@@ -3,4 +3,7 @@ home-assistant_v2.db*
 secrets.yaml
 *.key
 tts/
+www/
+.cache/
 .storage/
+config/deprecated/

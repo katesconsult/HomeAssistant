@@ -1,0 +1,114 @@
+- id: '1777469444858'
+  name: Family room watch TV
+  entities:
+    cover.family_room_far_left_bottom:
+      is_closed: false
+      current_position: 25
+      room_name: Family Room
+      device_class: shade
+      friendly_name: Family Room Far Left Bottom
+      supported_features: 15
+      state: open
+    cover.family_room_center_left_bottom:
+      is_closed: false
+      current_position: 25
+      room_name: Family Room
+      device_class: shade
+      friendly_name: Family Room Center Left Bottom
+      supported_features: 15
+      state: opening
+    cover.family_room_center_right_bottom:
+      is_closed: false
+      current_position: 25
+      room_name: Family Room
+      device_class: shade
+      friendly_name: Family Room Center Right Bottom
+      supported_features: 15
+      state: open
+    cover.family_room_far_right_bottom:
+      is_closed: false
+      current_position: 25
+      room_name: Family Room
+      device_class: shade
+      friendly_name: Family Room Far Right Bottom
+      supported_features: 15
+      state: open
+  metadata:
+    cover.family_room_center_left_bottom:
+      entity_only: true
+    cover.family_room_far_left_bottom:
+      entity_only: true
+    cover.family_room_center_right_bottom:
+      entity_only: true
+    cover.family_room_far_right_bottom:
+      entity_only: true
+  icon: mdi:blinds
+- id: '1777469632823'
+  name: Family room watch TV
+  entities:
+    cover.family_room_far_left_bottom:
+      is_closed: false
+      current_position: 25
+      room_name: Family Room
+      device_class: shade
+      friendly_name: Family Room Far Left Bottom
+      supported_features: 15
+      state: closing
+  metadata:
+    cover.family_room_far_left_bottom:
+      entity_only: true
+  icon: mdi:blinds
+- id: '1777469684329'
+  name: Family room watch TV scene
+  entities: {}
+  icon: mdi:blinds
+- id: '1778183618462'
+  name: Morning Sunlight Block
+  entities:
+    cover.family_room_fireplace_wall_bottom:
+      is_closed: false
+      current_position: 30
+      room_name: Family Room
+      device_class: shade
+      friendly_name: Family Room Fireplace Wall Bottom
+      supported_features: 15
+      state: open
+    cover.family_room_far_left_bottom:
+      is_closed: false
+      current_position: 23
+      room_name: Family Room
+      device_class: shade
+      friendly_name: Family Room Far Left Bottom
+      supported_features: 15
+      state: open
+  metadata:
+    cover.family_room_fireplace_wall_bottom:
+      entity_only: true
+    cover.family_room_far_left_bottom:
+      entity_only: true
+  icon: mdi:roller-shade-closed
+- id: '1778183641201'
+  name: Morning Sunlight Block
+  entities:
+    cover.family_room_fireplace_wall_bottom:
+      is_closed: false
+      current_position: 30
+      room_name: Family Room
+      device_class: shade
+      friendly_name: Family Room Fireplace Wall Bottom
+      supported_features: 15
+      state: open
+    cover.family_room_far_left_bottom:
+      is_closed: false
+      current_position: 23
+      room_name: Family Room
+      device_class: shade
+      friendly_name: Family Room Far Left Bottom
+      supported_features: 15
+      state: open
+  metadata:
+    cover.family_room_fireplace_wall_bottom:
+      entity_only: true
+    cover.family_room_far_left_bottom:
+      entity_only: true
+  icon: mdi:roller-shade-closed

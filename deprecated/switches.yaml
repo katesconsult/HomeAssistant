@@ -1,0 +1,15 @@
+- name: "WB01 Charger"
+  unique_id: wb01_charger
+  turn_on:
+    service: rest_command.start_wb01
+  turn_off:
+    service: rest_command.stop_wb01
+  state: "off"
+
+- name: "WB02 Charger"
+  unique_id: wb02_charger
+  turn_on:
+    service: rest_command.start_wb02
+  turn_off:
+    service: rest_command.stop_wb02
+  state: "off"

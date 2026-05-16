@@ -1,0 +1,48 @@
+blueprint:
+  name: Sync Cover Position with Slider
+  description: Keeps a Template Cover (or any cover) and an input_number in sync.
+  domain: automation
+  input:
+    target_cover:
+      name: Cover Entity
+      selector:
+        entity:
+          domain: cover
+    target_slider:
+      name: Input Number (Slider)
+      selector:
+        entity:
+          domain: input_number
+
+trigger:
+  - platform: state
+    entity_id: !input target_cover
+    attribute: current_position
+    id: "cover_moved"
+  - platform: state
+    entity_id: !input target_slider
+    id: "slider_moved"
+
+action:
+  - choose:
+      # If the physical cover moves, update the slider
+      - conditions:
+          - condition: trigger
+            id: "cover_moved"
+        sequence:
+          - service: input_number.set_value
+            target:
+              entity_id: !input target_slider
+            data:
+              value: "{{ state_attr(trigger.entity_id, 'current_position') | float }}"
+              
+      # If the slider moves, update the cover position
+      - conditions:
+          - condition: trigger
+            id: "slider_moved"
+        sequence:
+          - service: cover.set_cover_position
+            target:
+              entity_id: !input target_cover
+            data:
+              position: "{{ trigger.to_state.state | int }}"

@@ -1,0 +1,113 @@
+{
+    "config": {
+        "abort": {
+            "unique_id": "La localisation de la station WeatherFlow est deja paramétrisée."
+        },
+        "error": {
+            "wrong_station_id": "La 'Station ID' est incorrecte. Vérifiez que vous n'utilisez pas l'ID de l'appareil.",
+            "server_error": "Une erreur inattendue a été détectée avec le service infonuagique de WeatherFlow",
+            "wrong_token": "Le Jeton-API est incorrecte ou ne correspond pas à cette station WeatherFlow.",
+            "offline_error": "La station est hors ligne ou aucune observation récente n'est disponible. Vérifiez le statut de la station ou retirez les capteurs et réessayez.",
+            "bad_request": "Une erreur inconnue s'est produite lors de la récupération des données."
+        },
+        "step": {
+            "user": {
+                "description": "Configurer une station de prévisions WeatherFlow",
+                "title": "Prévisions WeatherFlow",
+                "data": {
+                    "station_id": "Station ID",
+                    "api_token": "Jeton-API personnel",
+                    "forecast_hours": "Heures à afficher pour les prévisions horaire",
+                    "add_sensors": "Ajouter les senseurs de la station WeatherFlow"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "api_token": "Jeton-API personnel",
+                    "forecast_hours": "Heures à afficher pour les prévisions horaire",
+                    "add_sensors": "Ajouter les senseurs de la station WeatherFlow"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "wind_cardinal": {
+                "state": {
+                    "n": "N",
+                    "nne": "NNE",
+                    "ne": "NE",
+                    "ene": "ENE",
+                    "e": "E",
+                    "ese": "ESE",
+                    "se": "SE",
+                    "sse": "SSE",
+                    "s": "S",
+                    "ssw": "SSO",
+                    "sw": "SO",
+                    "wsw": "OSO",
+                    "w": "O",
+                    "wnw": "ONO",
+                    "nw": "NO",
+                    "nnw": "NNO"
+                }
+            },
+            "pressure_trend": {
+                "state": {
+                    "falling": "À la baisse",
+                    "rising": "À la hausse",
+                    "steady": "Constante"
+                }
+            },
+            "precipitation_type": {
+                "state": {
+                    "no_rain": "Pas de pluie",
+                    "rain": "Pluie",
+                    "heavy_rain": "Pluie forte/grêle"
+                }
+            },
+            "beaufort": {
+                "state": {
+                    "calm": "Calme",
+                    "light_air": "Très légère brise",
+                    "light_breeze": "Légère brise",
+                    "gentle_breeze": "Petite brise",
+                    "moderate_breeze": "Jolie brise",
+                    "fresh_breeze": "Bonne brise",
+                    "strong_breeze": "Vent frais",
+                    "moderate_gale": "Grand frais",
+                    "fresh_gale": "Coup de vent",
+                    "strong_gale": "Fort coup de vent",
+                    "storm": "Tempête",
+                    "violent_storm": "Violente tempête",
+                    "hurricane": "Ouragan"
+                }
+            },
+            "precip_intensity": {
+                "state": {
+                    "no_rain": "Aucune",
+                    "very_light": "Très légère",
+                    "light": "Légère",
+                    "moderate": "Modérée",
+                    "heavy": "Élevé",
+                    "very_heavy": "Très élevé",
+                    "extreme": "Extrême"
+                }
+            },
+            "uv_description": {
+                "state": {
+                    "extreme": "Extrême",
+                    "very-high": "Très élevé",
+                    "high": "Élevé",
+                    "moderate": "Modéré",
+                    "low": "Bas",
+                    "none": "None"
+                }
+            }
+        }
+    }
+}

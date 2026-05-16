@@ -4,7 +4,10 @@ default_config:
 
 # Load frontend themes from the themes folder
 frontend:
-  themes: !include_dir_merge_named themes
+  #themes: !include_dir_merge_named themes
+  extra_module_url:
+    - /hacsfiles/enhanced-shutter-card/enhanced-shutter-card.js
+    #- /hacsfiles/enhanced-shutter-card/enhanced-shutter-card.js?hacstag=879861835143
 
 # Install ssl certificate for HTTPS and set up reverse proxy
 http:
@@ -13,37 +16,51 @@ http:
   #ssl_key: /ssl/origin.key
   use_x_forwarded_for: true
   trusted_proxies:
+    - 127.0.0.1
+    - 172.30.33.0/24  # This is the internal Home Assistant network
     - 192.168.4.152   # IP of your reverse proxy
-    - 172.16.0.0/12   # (optional) Cloudflare proxy IPs if using Cloudflare Tunnel
-
+#    - 172.16.0.0/12   # (optional) Cloudflare proxy IPs if using Cloudflare Tunnel
 
 # Set external URL
 homeassistant:
+  name: Niwot
+  latitude: 40.0988
+  longitude: -105.1741
+  elevation: 1547  # Altitude in meters
+  time_zone: America/Denver  
   external_url: "https://niwotha.katesconsult.com"
+  allowlist_external_dirs:
+    - "/config"
+  
+
+# Configure RESTful API calls for EMHASS
+#rest_command: !include steve_commands.yaml
+#sql: !include steve_queries.yaml
+rest_command: !include rest_commands.yaml
 
 # Include definitions for various entities
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
-
-# Define cameras
-#mqtt: !include mqtt.yaml
-camera: !include cameras.yaml
-
-# Define shades (covers), display formats for vehicles, weather, etc.
 template: !include templates.yaml
-input_number: !include input_number.yaml
-input_boolean: !include input_boolean.yaml
 
-# Configure steve and wallbox APIs and queries
-rest_command: !include steve_commands.yaml
-#sql: !include steve_queries.yaml
+# Set up family room sonos to send play/pause and direction buttons to TV
+media_player: !include media_player.yaml
+
+# Configure Sonos speakers
+#sonos:
+#  media_player:
+#    advertise_addr: 192.168.4.151   # home assistant RPi
+   
+# Enable the Wake-on-LAN service
+wake_on_lan:
 
 # Initialize logger to debug custom components
-logger:
-  default: info
-  logs:
-    custom_components.openweather_forecasts: debug
+#logger:
+#  default: info
+#  logs:
+#    custom_components.openweather_forecasts: debug
+#    homeassistant.components.rest_command: debug
 
 # Clean up database (home-assistant_v2.db)
 recorder:

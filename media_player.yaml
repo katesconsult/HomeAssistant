@@ -1,0 +1,101 @@
+# Family Room TV
+- platform: universal
+  name: Family Room Hybrid TV
+  children:
+    - media_player.family_room_fire_tv
+    - media_player.family_room_sonos
+  commands:
+    turn_on:
+      action: media_player.turn_on
+      target:
+        entity_id: media_player.family_room_fire_tv
+    turn_off:
+      action: media_player.turn_off
+      target:
+        entity_id: media_player.family_room_fire_tv
+    volume_up:
+      action: media_player.volume_up
+      target:
+        entity_id: media_player.family_room_sonos
+    volume_down:
+      action: media_player.volume_down
+      target:
+        entity_id: media_player.family_room_sonos
+    volume_mute:
+      action: media_player.volume_mute
+      target:
+        entity_id: media_player.family_room_sonos
+      data:
+        is_volume_muted: "{{ is_volume_muted }}"
+    volume_set:
+      action: media_player.volume_set
+      target:
+        entity_id: media_player.family_room_sonos
+      data:
+        volume_level: "{{ volume_level }}"
+
+  # These tell the Universal player which entity to "mimic" for the UI sliders
+  attributes:
+    is_volume_muted: media_player.family_room_sonos|is_volume_muted
+    volume_level: media_player.family_room_sonos|volume_level
+    
+
+# Basement Gym TV
+- platform: universal
+  name: Basement Gym Hybrid TV
+  unique_id: basement_tcl_fire_tv_universal
+  children:
+    - media_player.basement_gym_fire_tv        # primary — ADB
+    - media_player.basement_gym_alexa_tv       # fallback — Alexa
+  commands:
+    turn_on:
+      service: media_player.turn_on
+      target:
+        entity_id: media_player.basement_gym_fire_tv
+    turn_off:
+      service: media_player.turn_off
+      target:
+        entity_id: media_player.basement_gym_fire_tv
+    volume_up:
+      service: androidtv.adb_command
+      target:
+        entity_id: media_player.basement_gym_fire_tv
+      data:
+        command: "input keyevent KEYCODE_VOLUME_UP"
+    volume_down:
+      service: androidtv.adb_command
+      target:
+        entity_id: media_player.basement_gym_fire_tv
+      data:
+        command: "input keyevent KEYCODE_VOLUME_DOWN"
+    volume_mute:
+      service: androidtv.adb_command
+      target:
+        entity_id: media_player.basement_gym_fire_tv
+      data:
+        command: "input keyevent KEYCODE_VOLUME_MUTE"
+    media_play_pause:
+      service: androidtv.adb_command
+      target:
+        entity_id: media_player.basement_gym_fire_tv
+      data:
+        command: "input keyevent KEYCODE_MEDIA_PLAY_PAUSE"
+    media_next_track:
+      service: androidtv.adb_command
+      target:
+        entity_id: media_player.basement_gym_fire_tv
+      data:
+        command: "input keyevent KEYCODE_MEDIA_NEXT"
+    media_previous_track:
+      service: androidtv.adb_command
+      target:
+        entity_id: media_player.basement_gym_fire_tv
+      data:
+        command: "input keyevent KEYCODE_MEDIA_PREVIOUS"
+  attributes:
+    state: media_player.basement_gym_fire_tv
+    source: media_player.basement_gym_fire_tv
+    source_list: media_player.basement_gym_fire_tv
+    media_title: media_player.basement_gym_fire_tv
+    media_artist: media_player.basement_gym_fire_tv
+    app_name: media_player.basement_gym_fire_tv

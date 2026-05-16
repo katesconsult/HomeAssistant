@@ -1,0 +1,18 @@
+# input_number Helpers
+
+# Virtual (mock) shade positions
+family_room_shade_position:
+  name: Family Room Shade Position
+  min: 0
+  max: 100
+  step: 1
+kitchen_shade_position:
+  name: Kitchen Shade Position
+  min: 0
+  max: 100
+  step: 1
+#master_bath_backyard_shade_position:
+#  name: Master Bath Backyard Shade Position
+#  min: 0
+#  max: 100
+#  step: 1

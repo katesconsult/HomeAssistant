@@ -1,0 +1,26 @@
+# rest_command: Meteostat REST API calls to retrieve hourly and daily data
+meteostat_daily:
+  url: "https://meteostat.p.rapidapi.com/point/daily?\
+    lat={{ latitude | urlencode }}&\
+    lon={{ longitude | urlencode }}&\
+    start={{ start_date | urlencode }}&\
+    end={{ end_date | urlencode }}&\
+    tz={{ time_zone }}&\
+    units=imperial"
+  method: GET
+  headers:
+    x-rapidapi-host: "meteostat.p.rapidapi.com"
+    x-rapidapi-key: "40f39438b4mshd3bd9a62c653f79p1fa94bjsn886e1e055ea1"
+    #x-rapidapi-key: "0801843631mshba562f061ef5715p12746fjsnbf9363139931"
+
+meteostat_hourly:
+  url: "https://meteostat.p.rapidapi.com/stations/hourly?\
+    station={{ station_code | urlencode }}\
+    &start={{ start_date | urlencode }}\
+    &end={{ end_date | urlencode }}\
+    &tz={{ time_zone }}\
+    &units=imperial"
+  method: GET
+  headers:
+    x-rapidapi-host: "meteostat.p.rapidapi.com"
+    x-rapidapi-key: "40f39438b4mshd3bd9a62c653f79p1fa94bjsn886e1e055ea1"

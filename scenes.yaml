@@ -1,0 +1,25 @@
+- id: '1778189774074'
+  name: Family Room Morning Sun Block
+  entities:
+    cover.family_room_fireplace_wall_bottom:
+      is_closed: false
+      current_position: 30
+      room_name: Family Room
+      device_class: shade
+      friendly_name: Family Room Fireplace Wall Bottom
+      supported_features: 15
+      state: open
+    cover.family_room_far_left_bottom:
+      is_closed: false
+      current_position: 24
+      room_name: Family Room
+      device_class: shade
+      friendly_name: Family Room Far Left Bottom
+      supported_features: 15
+      state: open
+  metadata:
+    cover.family_room_fireplace_wall_bottom:
+      entity_only: true
+    cover.family_room_far_left_bottom:
+      entity_only: true
+  icon: mdi:roller-shade-closed

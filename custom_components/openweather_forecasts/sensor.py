@@ -52,8 +52,8 @@ class OpenWeatherForecastSensor(CoordinatorEntity, SensorEntity):
         self._sensor_type = sensor_type
         #self._location = location
         #self._attr_name = name
-        self._attr_name = f"{location} {name}"
-        self._attr_unique_id = f"{entry_id}_{sensor_type}"
+        self._attr_name = f"Weather {location} {name}"
+        self._attr_unique_id = f"weather_{entry_id}_{sensor_type}"
         self._attr_native_unit_of_measurement = unit
 
     @property
@@ -81,21 +81,41 @@ class OpenWeatherForecastSensor(CoordinatorEntity, SensorEntity):
             "last_update": self.coordinator.data.get("last_update"),
             "source": "OpenWeather Forecasts",
         }
-    '''
 
     @property
     def extra_state_attributes(self):
         return {
             "source": "OpenWeather Forecasts",
         }
-
+    '''
+    
+    @property
+    def extra_state_attributes(self):
+        """Return the state attributes."""
+        # Get the forecast list we added to the coordinator earlier
+        forecast = self.coordinator.data.get("forecast", [])
+        
+        return {
+            "source": "OpenWeather Forecasts",
+            "last_update": self.coordinator.data.get("last_updated"),
+            "forecast": forecast  # This is what ApexCharts will read
+        }
+        
     @property
     def available(self):
         """Entity availability."""
         return self.coordinator.last_update_success
 
+    '''
     @property
     def entity_picture(self):
         path = f"/local/{DOMAIN}/forecast.png"
         _LOGGER.debug("Returning entity_picture path: %s", path)
         return f"/config/www/{DOMAIN}/forecast.png"
+    '''
+    
+    @property
+    def entity_picture(self):
+        """Return the URL for the entity picture."""
+        # This path points to /config/www/your_domain/forecast.png
+        return f"/local/{DOMAIN}/forecast.png"

@@ -1,0 +1,113 @@
+{
+    "config": {
+        "abort": {
+            "unique_id": "WeatherFlow station is reeds geconfigured."
+        },
+        "error": {
+            "wrong_station_id": "De Station Id is niet juist. Controleer of je geen gebruik maakt van het apparaat-ID.",
+            "server_error": "WeatherFlow servers encountered an unexpected error",
+            "wrong_token": "Het Api Token is niet juist.",
+            "offline_error": "Het station is ofwel offline of er zijn geen recente observaties. Controleer de status van het station of verwijder sensoren en probeer het opnieuw.",
+            "bad_request": "Een onbekende fout in opgetreden tijdens het ophalen van de gegevens."
+        },
+        "step": {
+            "user": {
+                "description": "Configuratie van een WeatherFlow Forecast station",
+                "title": "WeatherFlow Forecast",
+                "data": {
+                    "station_id": "Station Id",
+                    "api_token": "Personal Api Token",
+                    "forecast_hours": "Hours to show in Hourly Forecast",
+                    "add_sensors": "Add sensors from the Weather Station"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "api_token": "Personal Api Token",
+                    "forecast_hours": "Hours to show in Hourly Forecast",
+                    "add_sensors": "Add sensors from the Weather Station"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "pressure_trend": {
+                "state": {
+                    "falling": "Dalend",
+                    "rising": "Stijgend",
+                    "steady": "Constant"
+                }
+            },
+            "wind_cardinal": {
+                "state": {
+                    "n": "N",
+                    "nne": "NNO",
+                    "ne": "NO",
+                    "ene": "ONO",
+                    "e": "O",
+                    "ese": "OZO",
+                    "se": "ZO",
+                    "sse": "ZZO",
+                    "s": "Z",
+                    "ssw": "ZZW",
+                    "sw": "ZW",
+                    "wsw": "WZW",
+                    "w": "W",
+                    "wnw": "WNW",
+                    "nw": "NW",
+                    "nnw": "NNW"
+                }
+            },
+            "precipitation_type": {
+                "state": {
+                    "no_rain": "Dry",
+                    "rain": "Rain",
+                    "heavy_rain": "Heavy rain/Hail"
+                }
+            },
+            "beaufort": {
+                "state": {
+                    "calm": "Windstil",
+                    "light_air": "Zwakke wind",
+                    "light_breeze": "Zwakke wind",
+                    "gentle_breeze": "Matige wind",
+                    "moderate_breeze": "Matige wind",
+                    "fresh_breeze": "Vrij krachtige wind",
+                    "strong_breeze": "Krachtige wind",
+                    "moderate_gale": "Harde wind",
+                    "fresh_gale": "Stormachtige wind",
+                    "strong_gale": "Storm",
+                    "storm": "Zware storm",
+                    "violent_storm": "Zeer ware storm",
+                    "hurricane": "Orkaan"
+                }
+            },
+            "precip_intensity": {
+                "state": {
+                    "no_rain": "Geen",
+                    "very_light": "Zeer licht",
+                    "light": "Licht",
+                    "moderate": "Matig",
+                    "heavy": "Zwaar",
+                    "very_heavy": "Zeer zwaar",
+                    "extreme": "Extreem"
+                }
+            },
+            "uv_description": {
+                "state": {
+                    "extreme": "Extreem",
+                    "very-high": "Zeer sterk",
+                    "high": "Sterk",
+                    "moderate": "Matig",
+                    "low": "Zwak",
+                    "none": "Geen"
+                }
+            }
+        }
+    }
+}
