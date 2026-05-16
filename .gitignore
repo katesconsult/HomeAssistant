@@ -7,3 +7,4 @@ www/
 .cache/
 .storage/
 config/deprecated/
+solcast_solar/
